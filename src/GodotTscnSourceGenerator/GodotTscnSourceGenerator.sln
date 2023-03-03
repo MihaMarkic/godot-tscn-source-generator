@@ -8,9 +8,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8594F649-3B09-4AF1-95B5-2567B701E231}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\README.md = ..\..\README.md
+		RELEASE-NOTES.txt = RELEASE-NOTES.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GodotTscnSourceGenerator.Test", "GodotTscnSourceGenerator.Test\GodotTscnSourceGenerator.Test.csproj", "{B0838E90-D1E1-449F-BF94-DF4A46336C3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodotTscnSourceGenerator.Test", "GodotTscnSourceGenerator.Test\GodotTscnSourceGenerator.Test.csproj", "{B0838E90-D1E1-449F-BF94-DF4A46336C3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

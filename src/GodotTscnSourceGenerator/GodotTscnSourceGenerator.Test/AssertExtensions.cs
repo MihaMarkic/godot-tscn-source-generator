@@ -10,6 +10,8 @@ internal static class AssertExtensions
         => constraint.Using<Node?>(CompareNodes);
     public static SomeItemsConstraint UsingNodeComparer(this SomeItemsConstraint constraint)
         => constraint.Using<Node?>(NodeComparer.Default);
+    public static EqualConstraint UsingScriptComparer(this EqualConstraint constraint)
+    => constraint.Using<Script?>(CompareScripts);
     static bool CompareNodes(Node? node, Node? other)
     {
         if (node is null && other is null || node is null ^ other is null)
@@ -21,6 +23,14 @@ internal static class AssertExtensions
             return false;
         }
         return node.Name == other.Name && node.Type == other.Type;
+    }
+    static bool CompareScripts(Script? a, Script? b)
+    {
+        if (a is null && b is null || a is null ^ b is null)
+        {
+            return false;
+        }
+        return a!.Path == b!.Path;
     }
 
     internal class NodeComparer : IEqualityComparer<Node?>

@@ -1,0 +1,1 @@
+﻿# Righthand Godot Source Generator
