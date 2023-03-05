@@ -1,3 +1,5 @@
+v.1.0.0-alpha2
+	- adds strong typed animation names
 v.1.0.0-alpha1
 	- initial version
 	- creates strong typed GetNode calls

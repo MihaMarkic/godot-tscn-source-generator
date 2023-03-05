@@ -31,12 +31,27 @@ Sample generated code:
 ```csharp
 partial class Player
 {
+	public static class AnimatedSprite2dNode
+	{
+		public static class SpriteFrames
+		{
+			public static StringName Up { get; } = "up";
+			public static StringName Walk { get; } = "walk";
+		}
+	}
 	public Area2D GetAlienNode() => GetNode<Area2D>("Alien");
 }
 ```
-If you have a class named `Player` you can use `GetAlienNode()` method without explicilty using generic argument or node name.
+If you have a class named `Player` you can use 
+a) `GetAlienNode()` method without explicilty using generic argument or node name.
+b) `node.Animation = AnimatedSprite2dNode.SpriteFrames.Up` instead of `node.Animation = "up"`
 Besides providing Intellisense auto completition, it also helps when nodes are renamed in .tscn file.
 If this happens, code won't compile anymore and it would require update.
+
+## Generated code
+
+* Strong typed GetNode<T>(name) calls
+* Animation name constants
 
 ## Roadmap
 

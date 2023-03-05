@@ -5,6 +5,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsRoslynComponent>true</IsRoslynComponent>
 
     <PackageId>Righthand.GodotSourceGenerator</PackageId>
     <Title>Righthand Godot Source Generator</Title>
@@ -14,7 +15,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.0.0-alpha1</Version>
+    <Version>1.0.0-alpha2</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>(Please write the package release notes in "RELEASE NOTES.txt)</PackageReleaseNotes>
     <AssemblyName>Righthand.GodotSourceGenerator</AssemblyName>
@@ -57,23 +58,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Righthand.GodotTscnParser" Version="1.0.0-alpha5" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="Righthand.GodotTscnParser" Version="1.0.0-alpha6" GeneratePathProperty="true" PrivateAssets="all" />
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" GeneratePathProperty="true" PrivateAssets="all" />
-    <!-- Package the generator in the analyzer directory of the nuget package -->
+     <!--Package the generator in the analyzer directory of the nuget package-->  
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <!-- Package references -->
+     <!--Package references--> 
     <None Include="$(PKGRighthand_GodotTscnParser)\lib\netstandard2.0\Righthand.GodotTscnParser.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(PKGAntlr4_Runtime_Standard)\lib\netstandard2.0\Antlr4.Runtime.Standard.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
-  <!--<PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
     <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
   </PropertyGroup>
 
-  <Target Name="GetDependencyTargetPaths">
+  <Target Name="GetDependencyTargetPaths" Condition=" '$(Configuration)'=='Debug' ">
     <ItemGroup>
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGRighthand_GodotTscnParser)\lib\netstandard2.0\GodotTscnParser.Engine.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGRighthand_GodotTscnParser)\lib\netstandard2.0\Righthand.GodotTscnParser.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGAntlr4_Runtime_Standard)\lib\netstandard2.0\Antlr4.Runtime.Standard.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
-  </Target>-->
+  </Target>
 </Project>

@@ -1,10 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using Antlr4.Runtime;
+﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using GodotTscnSourceGenerator.Models;
 using Microsoft.CodeAnalysis;
 using Righthand.GodotTscnParser.Engine.Grammar;
+using System;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
 
 namespace GodotTscnSourceGenerator
 {
@@ -18,20 +20,26 @@ namespace GodotTscnSourceGenerator
                 try
                 {
                     string tscnContent = file.GetText()!.ToString();
-                    var listener = Run(tscnContent);
+                    //context.AddSource($"{Path.GetFileName(file.Path)}.g.cs", $"/// {DateTime.Now}");
                     // process only .tscn files with scripts
+                    var listener = Run(tscnContent);
                     if (listener.Script is not null)
                     {
-                        var sb = new StringBuilder();
+                        var sb = new CodeStringBuilder();
                         sb.AppendLine("using Godot;");
-                        string safeClassName = GetSafeName(listener.Script.ClassName);
+                        string safeClassName = listener.Script.ClassName.GetSafeName();
                         sb.AppendLine($"partial class {safeClassName}");
-                        sb.AppendLine("{");
+                        sb.AppendStartBlock();
                         foreach (var n in listener.Nodes)
                         {
-                            sb.AppendLine($"\tpublic {n.Type} Get{GetSafeName(n.Name)}Node() => GetNode<{n.Type}>(\"{n.Name}\");");
+                            PopulateNodeConstants(sb, n);
                         }
-                        sb.AppendLine("}");
+                        foreach (var n in listener.Nodes)
+                        {
+                            sb.AppendLine($"public {n.Type} Get{n.Name.GetSafeName()}Node() => GetNode<{n.Type}>(\"{n.Name}\");");
+
+                        }
+                        sb.AppendEndBlock();
                         context.AddSource($"{listener.Script.ClassName}.g.cs", sb.ToString());
                     }
                 }
@@ -46,6 +54,28 @@ namespace GodotTscnSourceGenerator
                             DiagnosticSeverity.Warning, true), null));
                     return;
                 }
+            }
+        }
+        public static void PopulateNodeConstants(CodeStringBuilder sb, Node n)
+        {
+            var animationResources = n.SubResources
+                .Where(sr => sr.Value.Animations.Length > 0)
+                .ToImmutableArray();
+            if (!animationResources.IsEmpty)
+            {
+                sb.AppendLine($"public static class {n.Name.GetSafeName()}Node");
+                sb.AppendStartBlock();
+                foreach (var res in animationResources)
+                {
+                    sb.AppendLine($"public static class {res.Key.ToPascalCase()}");
+                    sb.AppendStartBlock();
+                    foreach (var a in res.Value.Animations)
+                    {
+                        sb.AppendLine($"public static StringName {a.Name.ToPascalCase()} {{ get; }} = \"{a.Name}\";");
+                    }
+                    sb.AppendEndBlock();
+                }
+                sb.AppendEndBlock();
             }
         }
         static string GetSafeName(string text)
