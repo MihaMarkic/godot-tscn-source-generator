@@ -43,8 +43,11 @@ partial class Player
 }
 ```
 If you have a class named `Player` you can use 
+
 a) `GetAlienNode()` method without explicilty using generic argument or node name.
+
 b) `node.Animation = AnimatedSprite2dNode.SpriteFrames.Up` instead of `node.Animation = "up"`
+
 Besides providing Intellisense auto completition, it also helps when nodes are renamed in .tscn file.
 If this happens, code won't compile anymore and it would require update.
 
