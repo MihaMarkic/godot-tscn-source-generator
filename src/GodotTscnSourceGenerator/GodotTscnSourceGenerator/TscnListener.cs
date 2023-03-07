@@ -1,13 +1,12 @@
-﻿using Antlr4.Runtime;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using GodotTscnSourceGenerator.Models;
 using Righthand.GodotTscnParser.Engine.Grammar;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Xml.Linq;
 using static Righthand.GodotTscnParser.Engine.Grammar.TscnParser;
 
 namespace GodotTscnSourceGenerator

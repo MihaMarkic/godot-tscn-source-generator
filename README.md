@@ -2,7 +2,7 @@
 
 ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Righthand.GodotSourceGenerator)
 
-Generates C# source code within Visual Studio 2022 based on Godot .tscn files.
+Generates C# source code within Visual Studio 2022 based on Godot project.godot and .tscn files.
 Based on [Righthand.GodotTscnParser](https://github.com/MihaMarkic/godot-tscn-parser) which in turn uses [ANTLR](https://www.antlr.org/).
 
 **NOTE**: Currently in alpha stage. If you have pull requests, problems or improvements ideas, feel free to create Issues.
@@ -41,12 +41,24 @@ partial class Player
 	}
 	public Area2D GetAlienNode() => GetNode<Area2D>("Alien");
 }
+
+public static partial class InputActions
+{
+	public static StringName MoveLeft { get; } = "move_left";
+	public static StringName MoveRight { get; } = "move_right";
+	public static StringName MoveUp { get; } = "move_up";
+	public static StringName MoveDown { get; } = "move_down";
+	public static StringName StartGame { get; } = "start_game";
+}
 ```
 If you have a class named `Player` you can use 
 
 a) `GetAlienNode()` method without explicilty using generic argument or node name.
 
 b) `node.Animation = AnimatedSprite2dNode.SpriteFrames.Up` instead of `node.Animation = "up"`
+
+c) `if (Input.IsActionPressed(InputActions.MoveRight))` instead of `if (Input.IsActionPressed("move_right))`.
+Note that InputActions are global constants.
 
 Besides providing Intellisense auto completition, it also helps when nodes are renamed in .tscn file.
 If this happens, code won't compile anymore and it would require update.
@@ -55,6 +67,7 @@ If this happens, code won't compile anymore and it would require update.
 
 * Strong typed GetNode<T>(name) calls
 * Animation name constants
+* Input actions names
 
 ## Roadmap
 

@@ -1,12 +1,12 @@
-﻿using Antlr4.Runtime;
+﻿using System;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using GodotTscnSourceGenerator.Models;
 using Microsoft.CodeAnalysis;
 using Righthand.GodotTscnParser.Engine.Grammar;
-using System;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
 
 namespace GodotTscnSourceGenerator
 {
@@ -15,14 +15,22 @@ namespace GodotTscnSourceGenerator
     {
         public void Execute(GeneratorExecutionContext context)
         {
-            foreach (var file in context.AdditionalFiles)
+            ProcessGodotProjFile(context);
+            ProcessTscnFiles(context);
+        }
+
+        public void ProcessTscnFiles(GeneratorExecutionContext context)
+        {
+            var tscnFiles = context.AdditionalFiles
+                .Where(f => string.Equals(Path.GetExtension(f.Path), ".tscn", StringComparison.OrdinalIgnoreCase));
+            foreach (var file in tscnFiles)
             {
                 try
                 {
                     string tscnContent = file.GetText()!.ToString();
                     //context.AddSource($"{Path.GetFileName(file.Path)}.g.cs", $"/// {DateTime.Now}");
                     // process only .tscn files with scripts
-                    var listener = Run(tscnContent);
+                    var listener = RunTscnListener(tscnContent);
                     if (listener.Script is not null)
                     {
                         var sb = new CodeStringBuilder();
@@ -37,7 +45,6 @@ namespace GodotTscnSourceGenerator
                         foreach (var n in listener.Nodes)
                         {
                             sb.AppendLine($"public {n.Type} Get{n.Name.GetSafeName()}Node() => GetNode<{n.Type}>(\"{n.Name}\");");
-
                         }
                         sb.AppendEndBlock();
                         context.AddSource($"{listener.Script.ClassName}.g.cs", sb.ToString());
@@ -50,12 +57,51 @@ namespace GodotTscnSourceGenerator
                             "GTSG0001",
                             $"TSCN parsing error on {file.Path}",
                             $"File {file.Path}: {ex.Message}",
-                            "Parsing",
+                            "Parsing tscn",
                             DiagnosticSeverity.Warning, true), null));
                     return;
                 }
             }
         }
+        public void ProcessGodotProjFile(GeneratorExecutionContext context)
+        {
+            var godotFile = context.AdditionalFiles
+                .Where(f => string.Equals(Path.GetFileName(f.Path), "project.godot", StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault();
+            if (godotFile is not null)
+            {
+                try
+                {
+                    string content = godotFile.GetText()!.ToString();
+                    var listener = RunGodotProjListener(content);
+                    if (listener.InputActions.Count > 0)
+                    {
+                        var sb = new CodeStringBuilder();
+                        sb.AppendLine("using Godot;");
+                        sb.AppendLine($"public static partial class InputActions");
+                        sb.AppendStartBlock();
+                        foreach (var ia in listener.InputActions)
+                        {
+                            sb.AppendLine($"public static StringName {ia.Name.ToPascalCase()} {{ get; }} = \"{ia.Name}\";");
+                        }
+                        sb.AppendEndBlock();
+                        context.AddSource($"InputActions.g.cs", sb.ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "GTSG0002",
+                            $"GODOTPROJ parsing error on {godotFile.Path}",
+                            $"File {godotFile.Path}: {ex.Message}",
+                            "Parsing GodotProj",
+                            DiagnosticSeverity.Warning, true), null));
+                    return;
+                }
+            }
+        }
+
         public static void PopulateNodeConstants(CodeStringBuilder sb, Node n)
         {
             var animationResources = n.SubResources
@@ -86,7 +132,7 @@ namespace GodotTscnSourceGenerator
         {
         }
 
-        TscnListener Run(string text)
+        TscnListener RunTscnListener(string text)
         {
             var input = new AntlrInputStream(text);
             var lexer = new TscnLexer(input);
@@ -99,6 +145,22 @@ namespace GodotTscnSourceGenerator
             parser.AddErrorListener(new ErrorListener());
             var tree = parser.file();
             var listener = new TscnListener();
+            ParseTreeWalker.Default.Walk(listener, tree);
+            return listener;
+        }
+        GodotProjListener RunGodotProjListener(string text)
+        {
+            var input = new AntlrInputStream(text);
+            var lexer = new GodotProjLexer(input);
+            lexer.AddErrorListener(new SyntaxErrorListener());
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new GodotProjParser(tokens)
+            {
+                BuildParseTree = true
+            };
+            parser.AddErrorListener(new ErrorListener());
+            var tree = parser.file();
+            var listener = new GodotProjListener();
             ParseTreeWalker.Default.Walk(listener, tree);
             return listener;
         }
