@@ -1,42 +1,110 @@
-﻿using Antlr4.Runtime;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using GodotTscnSourceGenerator.Models;
 using Righthand.GodotTscnParser.Engine.Grammar;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Xml.Linq;
 using static Righthand.GodotTscnParser.Engine.Grammar.TscnParser;
 
 namespace GodotTscnSourceGenerator
 {
-    public class TscnListener: TscnBaseListener
+    public class TscnListener : TscnBaseListener
     {
+        public Node? RootNode { get; private set; }
         public List<Node> Nodes { get; } = new List<Node>();
         public Script? Script { get; private set; }
+        public Dictionary<string, Script> Scripts { get; } = new Dictionary<string, Script>();
         public Dictionary<string, SubResource> SubResources { get; } = new Dictionary<string, SubResource>();
-
+        public Dictionary<string, ExtResource> ExtResources { get; } = new Dictionary<string, ExtResource>();
         public override void ExitNode([NotNull] NodeContext context)
         {
-            var pairs = context.pair().GetStringPairs();
-            if (pairs.TryGetValue("name", out var name) && pairs.TryGetValue("type", out var type))
+            var pairs = context.complexPair().GetComplexPairs();
+            if (pairs.TryGetValue("name", out var nameValue))
             {
-                if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(type))
+                string? name = nameValue.value()?.GetString();
+                Script? script = null;
+                if (!string.IsNullOrEmpty(name))
                 {
-                    var complexPairs = context.complexPair().GetComplexPairs();
-                    //var subResourceReferences = pairs.Where(p => )
-                    var subResourceRefs = ExtractSubResourceReferences(complexPairs);
-                    var subResources = subResourceRefs.Select(sr => new
+                    string? type = null;
+                    if (pairs.TryGetValue("script", out var scriptExtResourceValue))
                     {
-                        Name = sr.Key,
-                        SubResource = SubResources[sr.Value],
-                    }).ToImmutableDictionary(p => p.Name, p => p.SubResource);
-                    Nodes.Add(new Node(name, type, subResources));
+                        script = GetExtResourceScript(scriptExtResourceValue);
+                        type = script?.ClassName;
+                    }
+                    else if (pairs.TryGetValue("type", out var typeValue))
+                    {
+                        type = typeValue.value()?.GetString();
+                    }
+                    else if (pairs.TryGetValue("instance", out var instanceValue))
+                    {
+                        type = GetClassNameFromInstance(instanceValue);
+                    }
+                    if (!string.IsNullOrEmpty(type))
+                    {
+                        // do not add root node as node
+                        var complexPairs = context.complexPair().GetComplexPairs();
+                        //var subResourceReferences = pairs.Where(p => )
+                        var subResourceRefs = ExtractSubResourceReferences(complexPairs);
+                        var subResources = subResourceRefs.Select(sr => new
+                        {
+                            Name = sr.Key,
+                            SubResource = SubResources[sr.Value],
+                        }).ToImmutableDictionary(p => p.Name, p => p.SubResource);
+                        HashSet<string> groups = new HashSet<string>();
+                        if (pairs.TryGetValue("groups", out var groupsValue))
+                        {
+                            var groupStrings =
+                                from cv in groupsValue.complexValueArray()?.complexValue()
+                                let g = cv.value()?.GetString()
+                                where !string.IsNullOrWhiteSpace(g)
+                                select g;
+                            foreach (var g in groupStrings)
+                            {
+                                groups.Add(g);
+                            }
+                        }
+                        if (pairs.ContainsKey("parent"))
+                        {
+                            Nodes.Add(new Node(name!, type!, subResources, groups));
+                        }
+                        else if (script is not null)
+                        {
+                            RootNode = new Node(name!, type!, subResources, groups);
+                            Script = script;
+                        }
+                    }
                 }
             }
             base.ExitNode(context);
+        }
+
+        internal string? GetClassNameFromInstance(ComplexValueContext context)
+        {
+            var extResourceRef = context.extResourceRef()?.resourceRef()?.GetString();
+            if (extResourceRef is not null)
+            {
+                if (ExtResources.TryGetValue(extResourceRef, out var extResource))
+                {
+                    return GetClassName(extResource.Path);
+                }
+            }
+            return null;
+        }
+
+        internal Script? GetExtResourceScript(ComplexValueContext context)
+        {
+            var extResourceRef = context.extResourceRef()?.resourceRef()?.GetString();
+            if (extResourceRef is not null)
+            {
+                if (Scripts.TryGetValue(extResourceRef, out var script))
+                {
+                    return script;
+                }
+            }
+            return null;
         }
 
         ImmutableDictionary<string, string> ExtractSubResourceReferences(
@@ -46,28 +114,11 @@ namespace GodotTscnSourceGenerator
             var query = from cp in complexPairs
                         let srr = cp.Value.subResourceRef()
                         where srr is not null
-                        select new 
+                        select new
                         {
                             Name = cp.Key,
                             Value = srr.resourceRef().GetString(),
                         };
-            //{
-            //    var objectArray = animationsContext.objectArray();
-            //    if (objectArray is not null)
-            //    {
-            //        foreach (var o in objectArray.@object())
-            //        {
-            //            foreach (var p in o.property())
-            //            {
-            //                if (p.propertyName().GetString() == "name")
-            //                {
-            //                    var reference = p.complexValue().value().@ref().propertyName().GetString();
-            //                    animations.Add(new Animation(reference));
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
             return query.ToImmutableDictionary(p => p.Name, p => p.Value);
         }
 
@@ -76,15 +127,22 @@ namespace GodotTscnSourceGenerator
             var pairs = context.pair().GetStringPairs();
             if (pairs.TryGetValue("type", out var type))
             {
-                switch (type)
+                if (pairs.TryGetValue("path", out var path) && !string.IsNullOrEmpty(path)
+                    && pairs.TryGetValue("id", out var id) && !string.IsNullOrEmpty(id))
                 {
-                    case "Script":
-                        if (pairs.TryGetValue("path", out var path))
-                        {
+                    switch (type)
+                    {
+                        case "Script":
                             string className = GetClassName(path);
-                            Script = new Script(className, path);
-                        }
-                        break;
+                            Scripts.Add(id, new Script(className, path));
+                            break;
+                        default:
+                            if (pairs.TryGetValue("uid", out var uid) && !string.IsNullOrEmpty(uid))
+                            {
+                                ExtResources.Add(id, new ExtResource(uid, id, type, path));
+                            }
+                            break;
+                    }
                 }
             }
             base.EnterExtResource(context);
@@ -158,7 +216,7 @@ namespace GodotTscnSourceGenerator
                 var terminal = p.value().children[0] as TerminalNodeImpl;
                 if (terminal != null && terminal.Symbol.Type == STRING)
                 {
-                    yield return new (p.children[0].GetText(), terminal.Symbol.Text.Trim('\"'));
+                    yield return new(p.children[0].GetText(), terminal.Symbol.Text.Trim('\"'));
                 }
             }
         }
@@ -170,7 +228,7 @@ namespace GodotTscnSourceGenerator
             foreach (var p in context)
             {
                 string name = p.complexPairName().GetText();
-                yield return new (name, p.complexValue());
+                yield return new(name, p.complexValue());
                 // checks if value is string
                 //var terminal = p.value().children[0] as TerminalNodeImpl;
                 //if (terminal != null && terminal.Symbol.Type == STRING)

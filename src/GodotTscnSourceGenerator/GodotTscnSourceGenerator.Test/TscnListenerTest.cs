@@ -42,12 +42,11 @@ internal class TscnListenerTest
     public class NodeParsing: TscnListenerTest
     {
         [Test]
-        public void GivenSingleNodeSample_CollectsNodeProperly()
+        public void GivenSingleNonRootNodeSample_CollectsNodeProperly()
         {
             const string input = """
                     [gd_scene load_steps=8 format=3]
-                    [node name="Player" type="Area2D"]
-                    script = ExtResource("1_8162q")
+                    [node name="Player" type="Area2D" parent="."]
                     metadata/_edit_group_ = true
                     """;
 
@@ -62,12 +61,23 @@ internal class TscnListenerTest
         {
             var actual = Run(LoadSample("Player")).Nodes;
 
-            Assert.That(actual, Has.Exactly(3).Items);
-            Assert.That(actual, Contains.Item(new Node("Player", "Area2D"))
-                .UsingNodeComparer());
+            Assert.That(actual, Has.Exactly(2).Items);
+            //Assert.That(actual, Contains.Item(new Node("Player", "Area2D"))
+            //    .UsingNodeComparer());
             Assert.That(actual, Contains.Item(new Node("AnimatedSprite2d", "AnimatedSprite2D"))
                 .UsingNodeComparer());
             Assert.That(actual, Contains.Item(new Node("CollisionShape2d", "CollisionShape2D"))
+                .UsingNodeComparer());
+        }
+        [Test]
+        public void GivenMainSample_CollectsNodesProperly()
+        {
+            var actual = Run(LoadSample("Main")).Nodes;
+
+            Assert.That(actual, Has.Exactly(11).Items);
+            Assert.That(actual, Contains.Item(new Node("Player", "Player"))
+                .UsingNodeComparer());
+            Assert.That(actual, Contains.Item(new Node("MobTimer", "Timer"))
                 .UsingNodeComparer());
         }
         [Test]
@@ -99,16 +109,50 @@ internal class TscnListenerTest
             Assert.That(actual.SubResources.Values.Single(),
                  Is.SameAs(listener.SubResources.Values.Single()));
         }
+        [Test]
+        public void WhenNodeIsResourceInstance_GetsCorrectNameFromTscn()
+        {
+            const string input = """
+                [gd_scene load_steps=8 format=3]
+                [ext_resource type="PackedScene" uid="uid://g76r1u8cf6n7" path="res://Player.tscn" id="3_s3hlu"]
+                [node name="Player" parent="." instance=ExtResource("3_s3hlu")]
+            """;
+            var actual = Run(input).Nodes.SingleOrDefault();
+
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual, Is.EqualTo(new Node("Player", "Player")).UsingNodeComparer());
+        }
+
+        [Test]
+        public void GivenSingleNonRootNodeWithGroupsSample_CollectsNodeProperly()
+        {
+            const string input = """
+            [gd_scene load_steps=8 format=3]
+            [node name="Player" type="Area2D" parent="." groups=["alfa", "beta"]]
+            metadata/_edit_group_ = true
+            """;
+
+            var actual = Run(input).Nodes;
+
+            var expectedGroups = new HashSet<string>();
+            expectedGroups.Add("alfa");
+            expectedGroups.Add("beta");
+            Assert.That(actual.Count, Is.EqualTo(1));
+            Assert.That(actual.Single(),
+                Is.EqualTo(new Node("Player", "Area2D", groups: expectedGroups)).UsingNodeComparer());
+        }
     }
     [TestFixture]
-    public class ExtResourceParsing: TscnListenerTest
+    public class ExtResourceParsing : TscnListenerTest
     {
         [Test]
-        public void GivenSingleNodeSample_CollectsScriptProperly()
+        public void GivenSingleRootNodeSample_CollectsScriptProperly()
         {
             const string input = """
                 [gd_scene load_steps=8 format=3]
                 [ext_resource type="Script" path="res://Player.cs" id="1_7w55o"]
+                [node name="Player"]
+                script = ExtResource("1_7w55o")
             """;
 
             var actual = Run(input).Script;

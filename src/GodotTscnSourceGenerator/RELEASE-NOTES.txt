@@ -1,3 +1,9 @@
+v.1.0.0-alpha4
+	- updates nodes and scripts parsing
+	- updates godot project parsing
+	- adds groups to nodes
+v.1.0.0-alpha3
+	 - adds input actions constants based on project.godot file parsing
 v.1.0.0-alpha2
 	- adds strong typed animation names
 v.1.0.0-alpha1

@@ -24,7 +24,7 @@ internal static class AssertExtensions
         {
             return false;
         }
-        return node.Name == other.Name && node.Type == other.Type;
+        return node.Name == other.Name && node.Type == other.Type && node.Groups.Except(other.Groups).Count() == 0;
     }
     static bool CompareSubResources(SubResource? x, SubResource? y)
     {

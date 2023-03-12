@@ -14,13 +14,4 @@ namespace GodotTscnSourceGenerator.Models
             Animations = animations;
         }
     }
-
-    public class Animation
-    {
-        public string Name { get; }
-        public Animation(string name)
-        {
-            Name = name;
-        }
-    }
 }
