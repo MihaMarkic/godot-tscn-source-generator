@@ -1,0 +1,21 @@
+<Project Sdk="Godot.NET.Sdk/4.0.0">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="Main.tscn" />
+    <AdditionalFiles Include="Mob.tscn" />
+    <AdditionalFiles Include="Player.tscn" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="Hud.tscn" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="project.godot" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Righthand.GodotSourceGenerator" Version="1.0.0-alpha4" />
+  </ItemGroup>
+
+</Project>
