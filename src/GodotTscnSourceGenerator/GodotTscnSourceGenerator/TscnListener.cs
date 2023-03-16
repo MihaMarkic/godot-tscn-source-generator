@@ -66,13 +66,14 @@ namespace GodotTscnSourceGenerator
                                 groups.Add(g);
                             }
                         }
-                        if (pairs.ContainsKey("parent"))
+                        if (pairs.TryGetValue("parent", out var parentValue))
                         {
-                            Nodes.Add(new Node(name!, type!, subResources, groups));
+                            string parent = parentValue.value().GetString();
+                            Nodes.Add(new Node(name!, type!, parent, subResources, groups));
                         }
                         else if (script is not null)
                         {
-                            RootNode = new Node(name!, type!, subResources, groups);
+                            RootNode = new Node(name!, type!, null, subResources, groups);
                             Script = script;
                         }
                     }

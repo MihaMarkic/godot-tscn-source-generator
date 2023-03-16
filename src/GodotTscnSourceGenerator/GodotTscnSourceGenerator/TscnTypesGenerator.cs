@@ -50,7 +50,8 @@ namespace GodotTscnSourceGenerator
                         }
                         foreach (var n in listener.Nodes)
                         {
-                            sb.AppendLine($"public {n.Type} Get{n.Name.GetSafeName()}Node() => GetNode<{n.Type}>(\"{n.Name}\");");
+                            string resourceName = n.Parent == "." ? n.Name : $"{n.Parent}/{n.Name}";
+                            sb.AppendLine($"public {n.Type} Get{n.Name.GetSafeName()}Node() => GetNode<{n.Type}>(\"{resourceName}\");");
                         }
                         sb.AppendEndBlock();
                         context.AddSource($"{listener.Script.ClassName}.g.cs", sb.ToString());

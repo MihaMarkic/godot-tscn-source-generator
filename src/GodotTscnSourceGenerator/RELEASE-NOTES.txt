@@ -1,3 +1,5 @@
+v.1.0.0-alpha5
+	- adds support for nested nodes
 v.1.0.0-alpha4
 	- updates nodes and scripts parsing
 	- updates godot project parsing

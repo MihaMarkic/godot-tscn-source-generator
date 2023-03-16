@@ -54,7 +54,7 @@ internal class TscnListenerTest
 
             Assert.That(actual.Count, Is.EqualTo(1));
             Assert.That(actual.Single(), 
-                Is.EqualTo(new Node("Player", "Area2D")).UsingNodeComparer());
+                Is.EqualTo(new Node("Player", "Area2D", ".")).UsingNodeComparer());
         }
         [Test]
         public void GivenPlayerSample_CollectsNodesProperly()
@@ -64,9 +64,9 @@ internal class TscnListenerTest
             Assert.That(actual, Has.Exactly(2).Items);
             //Assert.That(actual, Contains.Item(new Node("Player", "Area2D"))
             //    .UsingNodeComparer());
-            Assert.That(actual, Contains.Item(new Node("AnimatedSprite2d", "AnimatedSprite2D"))
+            Assert.That(actual, Contains.Item(new Node("AnimatedSprite2d", "AnimatedSprite2D", "."))
                 .UsingNodeComparer());
-            Assert.That(actual, Contains.Item(new Node("CollisionShape2d", "CollisionShape2D"))
+            Assert.That(actual, Contains.Item(new Node("CollisionShape2d", "CollisionShape2D", "."))
                 .UsingNodeComparer());
         }
         [Test]
@@ -75,9 +75,20 @@ internal class TscnListenerTest
             var actual = Run(LoadSample("Main")).Nodes;
 
             Assert.That(actual, Has.Exactly(11).Items);
-            Assert.That(actual, Contains.Item(new Node("Player", "Player"))
+            Assert.That(actual, Contains.Item(new Node("Player", "Player", "."))
                 .UsingNodeComparer());
-            Assert.That(actual, Contains.Item(new Node("MobTimer", "Timer"))
+            Assert.That(actual, Contains.Item(new Node("MobTimer", "Timer", "."))
+                .UsingNodeComparer());
+        }
+        [Test]
+        public void GivenNestedSample_CollectsNodesProperly()
+        {
+            var actual = Run(LoadSample("Nested")).Nodes;
+
+            Assert.That(actual, Has.Exactly(6).Items);
+            Assert.That(actual, Contains.Item(new Node("FirstFollow", "PathFollow2D", "TextureRect/First"))
+                .UsingNodeComparer());
+            Assert.That(actual, Contains.Item(new Node("GruntiSprite", "Sprite2D", "TextureRect/First/FirstFollow/Grunti"))
                 .UsingNodeComparer());
         }
         [Test]
@@ -120,7 +131,7 @@ internal class TscnListenerTest
             var actual = Run(input).Nodes.SingleOrDefault();
 
             Assert.That(actual, Is.Not.Null);
-            Assert.That(actual, Is.EqualTo(new Node("Player", "Player")).UsingNodeComparer());
+            Assert.That(actual, Is.EqualTo(new Node("Player", "Player",".")).UsingNodeComparer());
         }
 
         [Test]
@@ -139,7 +150,22 @@ internal class TscnListenerTest
             expectedGroups.Add("beta");
             Assert.That(actual.Count, Is.EqualTo(1));
             Assert.That(actual.Single(),
-                Is.EqualTo(new Node("Player", "Area2D", groups: expectedGroups)).UsingNodeComparer());
+                Is.EqualTo(new Node("Player", "Area2D", ".", groups: expectedGroups)).UsingNodeComparer());
+        }
+        [Test]
+        public void WhenNodeHasParent_ReadsParentCorrectly()
+        {
+            const string input = """
+                [gd_scene load_steps=8 format=3]
+                [node name="FirstFollow" type="PathFollow2D" parent="TextureRect/First"]
+                """;
+
+            var actual = Run(input).Nodes;
+
+            Assert.That(actual.Count, Is.EqualTo(1));
+            var node = actual.Single();
+            Assert.That(node.Parent, Is.EqualTo("TextureRect/First"));
+
         }
     }
     [TestFixture]

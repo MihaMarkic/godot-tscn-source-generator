@@ -1,0 +1,47 @@
+[gd_scene load_steps=7 format=3 uid="uid://c7lognebwj41x"]
+
+[ext_resource type="Script" path="res://Lewel.cs" id="1_21el0"]
+[ext_resource type="Texture2D" uid="uid://deahhgmttxwyk" path="res://Assets/Backgrounds/NovaGorica.png" id="1_dt8ep"]
+[ext_resource type="PackedScene" uid="uid://0ncmsw5mce06" path="res://grunt.tscn" id="2_5is5v"]
+[ext_resource type="Script" path="res://Grunti.cs" id="4_phuk1"]
+[ext_resource type="Texture2D" uid="uid://bmcc57qcn2y3h" path="res://Assets/Enemies/Grunt/Grunt.png" id="5_xip7k"]
+
+[sub_resource type="Curve2D" id="Curve2D_gxhjp"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 96, 1832, 0, 0, 0, 0, 272, 1320, 0, 0, 0, 0, 808, 1032, 0, 0, 0, 0, 952, 1328, 0, 0, 0, 0, 680, 1496, 0, 0, 0, 0, 832, 1672, 0, 0, 0, 0, 1240, 1448, 0, 0, 0, 0, 1168, 1288, 0, 0, 0, 0, 1232, 1056, 0, 0, 0, 0, 1200, 952, 0, 0, 0, 0, 1304, 640, 0, 0, 0, 0, 1392, 576, 0, 0, 0, 0, 1200, 408)
+}
+point_count = 13
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_21el0")
+GruntScene = ExtResource("2_5is5v")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(2967, 1800)
+offset_right = 2967.0
+offset_bottom = 1800.0
+mouse_filter = 0
+texture = ExtResource("1_dt8ep")
+
+[node name="First" type="Path2D" parent="TextureRect"]
+curve = SubResource("Curve2D_gxhjp")
+
+[node name="FirstFollow" type="PathFollow2D" parent="TextureRect/First"]
+position = Vector2(96, 1832)
+rotation = -1.2397
+loop = false
+lookahead = 20.0
+
+[node name="Grunti" type="Area2D" parent="TextureRect/First/FirstFollow"]
+visible = false
+script = ExtResource("4_phuk1")
+
+[node name="GruntiSprite" type="Sprite2D" parent="TextureRect/First/FirstFollow/Grunti"]
+texture = ExtResource("5_xip7k")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+rotation = 1.82387
+anchor_mode = 0
+drag_horizontal_enabled = true
+
+[connection signal="gui_input" from="TextureRect" to="." method="_on_texture_rect_gui_input"]

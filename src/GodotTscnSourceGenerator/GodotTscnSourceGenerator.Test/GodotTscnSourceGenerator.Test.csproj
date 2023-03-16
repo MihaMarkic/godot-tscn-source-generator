@@ -25,6 +25,9 @@
     <None Update="Samples\Main.tscn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Samples\Nested.tscn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Samples\Player.tscn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
