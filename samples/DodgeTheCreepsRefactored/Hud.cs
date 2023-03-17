@@ -10,40 +10,40 @@ public partial class Hud : CanvasLayer
 
 	public void ShowMessage(string text)
 	{
-		var message = GetMessageNode();
+		var message = Message.Instance;
 		message.Text = text;
 		message.Show();
 
-		GetMessageTimerNode().Start();
+		MessageTimer.Instance.Start();
 	}
 
 	async public void ShowGameOver()
 	{
 		ShowMessage("Game Over");
 
-		var messageTimer = GetMessageTimerNode();
+		var messageTimer = MessageTimer.Instance;
 		await ToSignal(messageTimer, "timeout");
 
-		var message = GetMessageNode();
+		var message = Message.Instance;
 		message.Text = "Dodge the\nCreeps!";
 		message.Show();
 
 		await ToSignal(GetTree().CreateTimer(1), "timeout");
-		GetStartButtonNode().Show();
+		StartButton.Instance.Show();
 	}
 	public void UpdateScore(int score)
 	{
-		GetScoreLabelNode().Text = score.ToString();
+		ScoreLabel.Instance.Text = score.ToString();
 	}
 	void OnMessageTimerTimeout()
 	{
-		GetMessageNode().Hide();
+		Message.Instance.Hide();
 	}
 
 
 	void OnStartButtonPressed()
 	{
-		GetStartButtonNode().Hide();
+		StartButton.Instance.Hide();
 		EmitSignal(SignalName.StartGame);
 	}
 

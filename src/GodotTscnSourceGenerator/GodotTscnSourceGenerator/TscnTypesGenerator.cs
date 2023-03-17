@@ -29,30 +29,16 @@ namespace GodotTscnSourceGenerator
                 try
                 {
                     string tscnContent = file.GetText()!.ToString();
-                    //context.AddSource($"{Path.GetFileName(file.Path)}.g.cs", $"/// {DateTime.Now}");
                     // process only .tscn files with scripts
-                    var listener = RunTscnListener(tscnContent);
-                    if (listener.Script is not null)
+                    var listener = RunTscnListener(tscnContent, context.ReportDiagnostic, file.Path);
+                    if (listener.Script is not null && listener.RootNode is not null)
                     {
                         var sb = new CodeStringBuilder();
                         sb.AppendLine("using Godot;");
                         string safeClassName = listener.Script.ClassName.GetSafeName();
                         sb.AppendLine($"partial class {safeClassName}");
                         sb.AppendStartBlock();
-                        foreach (var n in listener.Nodes)
-                        {
-                            PopulateNodeConstants(sb, n);
-                        }
-                        // root node is a special case, just great class Groups
-                        if (listener.RootNode?.Groups.Count > 0)
-                        {
-                            CreateGroupConstants(sb, listener.RootNode.Groups);
-                        }
-                        foreach (var n in listener.Nodes)
-                        {
-                            string resourceName = n.Parent == "." ? n.Name : $"{n.Parent}/{n.Name}";
-                            sb.AppendLine($"public {n.Type} Get{n.Name.GetSafeName()}Node() => GetNode<{n.Type}>(\"{resourceName}\");");
-                        }
+                        PopulateNodeResources(sb, safeClassName, listener.RootNode);
                         sb.AppendEndBlock();
                         context.AddSource($"{listener.Script.ClassName}.g.cs", sb.ToString());
                     }
@@ -109,34 +95,56 @@ namespace GodotTscnSourceGenerator
             }
         }
 
-        public static void PopulateNodeConstants(CodeStringBuilder sb, Node n)
+        public static void PopulateNodeResources(CodeStringBuilder sb, string owner, Node n)
         {
+            bool isNotRoot = n.Parent is not null;
             var animationResources = n.SubResources
                 .Where(sr => sr.Value.Animations.Length > 0)
                 .ToImmutableArray();
             var groups = n.Groups;
-            if (!animationResources.IsEmpty || groups.Count > 0)
+            string structName = $"{n.Name.GetSafeName()}Node";
+            if (isNotRoot)
             {
-                sb.AppendLine($"public static class {n.Name.GetSafeName()}Node");
+                sb.AppendLine($"public record struct {structName}");
                 sb.AppendStartBlock();
-                if (!animationResources.IsEmpty)
+                sb.AppendLine($"readonly {owner} owner;");
+            }
+            foreach (var child in n.Children)
+            {
+                PopulateNodeResources(sb, owner, child);
+            }
+            if (isNotRoot)
+            {
+                string resourceName = n.ParentPath == "." ? n.Name : $"{n.ParentPath}/{n.Name}";
+                sb.AppendLine($"public {n.Type} Instance => owner.GetNode<{n.Type}>(\"{resourceName}\");");
+                sb.AppendLine($"public {structName} ({owner} owner) => this.owner = owner;");
+            }
+            foreach (var child in n.Children)
+            {
+                string childType = $"{child.Name.GetSafeName()}Node";
+                string ownerInstance = isNotRoot ? "owner" : "this";
+                sb.AppendLine($"public {childType} {child.Name} => new {childType}({ownerInstance});");
+            }
+            if (!animationResources.IsEmpty)
+            {
+                foreach (var res in animationResources)
                 {
-                    foreach (var res in animationResources)
+                    sb.AppendLine($"public static class {res.Key.ToPascalCase()}");
+                    sb.AppendStartBlock();
+                    foreach (var a in res.Value.Animations)
                     {
-                        sb.AppendLine($"public static class {res.Key.ToPascalCase()}");
-                        sb.AppendStartBlock();
-                        foreach (var a in res.Value.Animations)
-                        {
-                            sb.AppendLine($"public static StringName {a.Name.ToPascalCase()} {{ get; }} = \"{a.Name}\";");
-                        }
-                        sb.AppendEndBlock();
+                        sb.AppendLine($"public static StringName {a.Name.ToPascalCase()} {{ get; }} = \"{a.Name}\";");
                     }
+                    sb.AppendEndBlock();
                 }
-                // creates Groups class with constants for each group
-                if (groups.Count > 0)
-                {
-                    CreateGroupConstants(sb, groups);
-                }
+            }
+            // creates Groups class with constants for each group
+            if (groups.Count > 0)
+            {
+                CreateGroupConstants(sb, groups);
+            }
+            if (isNotRoot)
+            {
                 sb.AppendEndBlock();
             }
         }
@@ -161,7 +169,7 @@ namespace GodotTscnSourceGenerator
         {
         }
 
-        TscnListener RunTscnListener(string text)
+        TscnListener RunTscnListener(string text, Action<Diagnostic> reportDiagnostic, string filePath)
         {
             var input = new AntlrInputStream(text);
             var lexer = new TscnLexer(input);
@@ -173,7 +181,7 @@ namespace GodotTscnSourceGenerator
             };
             parser.AddErrorListener(new ErrorListener());
             var tree = parser.file();
-            var listener = new TscnListener();
+            var listener = new TscnListener(reportDiagnostic, filePath);
             ParseTreeWalker.Default.Walk(listener, tree);
             return listener;
         }

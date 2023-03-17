@@ -41,7 +41,7 @@ public partial class Player : Area2D
 			velocity.Y -= 1;
 		}
 
-		var animatedSprite2D = GetAnimatedSprite2DNode();
+		var animatedSprite2D = AnimatedSprite2D.Instance;
 
 		if (velocity.Length() > 0)
 		{
@@ -78,13 +78,13 @@ public partial class Player : Area2D
 		Hide(); // Player disappears after being hit.
 		EmitSignal(SignalName.Hit);
 		// Must be deferred as we can't change physics properties on a physics callback.
-		GetCollisionShape2DNode().SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
+		CollisionShape2D.Instance.SetDeferred(Godot.CollisionShape2D.PropertyName.Disabled, true);
 	}
 
 	public void Start(Vector2 pos)
 	{
 		Position = pos;
 		Show();
-		GetCollisionShape2DNode().Disabled = false;
+		CollisionShape2D.Instance.Disabled = false;
 	}
 }

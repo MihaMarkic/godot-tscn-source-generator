@@ -21,11 +21,11 @@ public partial class Main : Node
 	
 	void GameOver()
 	{
-		GetMusicNode().Stop();
-		GetDeathSoundNode().Play();
-		GetMobTimerNode().Stop();
-		GetScoreTimerNode().Stop();
-		GetHudNode().ShowGameOver();
+		Music.Instance.Stop();
+		DeathSound.Instance.Play();
+        MobTimer.Instance.Stop();
+		ScoreTimer.Instance.Stop();
+		Hud.Instance.ShowGameOver();
 	}
 	
 	public void NewGame()
@@ -34,17 +34,17 @@ public partial class Main : Node
 
 		Score = 0;
 
-		var player = GetPlayerNode();
-		var startPosition = GetStartPositionNode();
+		var player = Player.Instance;
+		var startPosition = StartPosition.Instance;
 		player.Start(startPosition.Position);
 
 		GetNode<Timer>("StartTimer").Start();
 
-		var hud = GetHudNode();
+		var hud = Hud.Instance;
 		hud.UpdateScore(Score);
 		hud.ShowMessage("Get Ready!");
 
-		GetMusicNode().Play();
+		Music.Instance.Play();
 	}
 
 	void OnMobTimerTimeout()
@@ -82,14 +82,14 @@ public partial class Main : Node
 	void OnScoreTimerTimeout()
 	{
 		Score++;
-		GetHudNode().UpdateScore(Score);
+		Hud.Instance.UpdateScore(Score);
 	}
 
 
 	void OnStartTimerTimeout()
 	{
-		GetMobTimerNode().Start();
-		GetScoreTimerNode().Start();
+		MobTimer.Instance.Start();
+		ScoreTimer.Instance.Start();
 	}
 
 }

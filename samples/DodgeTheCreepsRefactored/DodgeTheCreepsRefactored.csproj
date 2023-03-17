@@ -14,8 +14,11 @@
   <ItemGroup>
     <AdditionalFiles Include="project.godot" />
   </ItemGroup>
-  <ItemGroup>
+  <!--<ItemGroup>
     <PackageReference Include="Righthand.GodotSourceGenerator" Version="1.0.0-alpha4" />
+  </ItemGroup>-->
+    <ItemGroup>
+    <ProjectReference Include="D:\GitProjects\Righthand\Godot\godot-tscn-source-generator\src\GodotTscnSourceGenerator\GodotTscnSourceGenerator\GodotTscnSourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

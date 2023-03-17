@@ -9,8 +9,7 @@ namespace GodotTscnSourceGenerator.Test;
 
 internal class TscnListenerTest
 {
-    protected TListener Run<TListener, TContext>(string text, Func<TscnParser, TContext> run)
-        where TListener : TscnBaseListener, new()
+    protected TscnListener Run<TContext>(string text, Func<TscnParser, TContext> run)
         where TContext : ParserRuleContext
     {
         var input = new AntlrInputStream(text);
@@ -23,14 +22,14 @@ internal class TscnListenerTest
         };
         parser.AddErrorListener(new ErrorListener());
         var tree = run(parser);
-        var listener = new TListener();
+        var listener = new TscnListener(_ => { }, "file");
         ParseTreeWalker.Default.Walk(listener, tree);
         return listener;
     }
 
     protected TscnListener Run(string text)
     {
-        return Run<TscnListener, TscnParser.FileContext>(text, p => p.file());
+        return Run<TscnParser.FileContext>(text, p => p.file());
     }
     protected string LoadSample(string fileName)
     {
@@ -46,49 +45,59 @@ internal class TscnListenerTest
         {
             const string input = """
                     [gd_scene load_steps=8 format=3]
-                    [node name="Player" type="Area2D" parent="."]
-                    metadata/_edit_group_ = true
+                    [ext_resource type="Script" path="res://Main.cs" id="1_4hmc7"]
+                    [node name="Player"]
+                    script = ExtResource("1_4hmc7")
                     """;
 
-            var actual = Run(input).Nodes;
+            var actual = Run(input).RootNode;
 
-            Assert.That(actual.Count, Is.EqualTo(1));
-            Assert.That(actual.Single(), 
-                Is.EqualTo(new Node("Player", "Area2D", ".")).UsingNodeComparer());
+            Assert.That(actual?.Children.Count, Is.EqualTo(0));
+            Assert.That(actual,
+                Is.EqualTo(new Node("Player", "Main", null, null)).UsingNodeComparer());
         }
         [Test]
         public void GivenPlayerSample_CollectsNodesProperly()
         {
-            var actual = Run(LoadSample("Player")).Nodes;
+            var actual = Run(LoadSample("Player")).RootNode;
 
-            Assert.That(actual, Has.Exactly(2).Items);
-            //Assert.That(actual, Contains.Item(new Node("Player", "Area2D"))
-            //    .UsingNodeComparer());
-            Assert.That(actual, Contains.Item(new Node("AnimatedSprite2d", "AnimatedSprite2D", "."))
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual!.Children, Has.Exactly(2).Items);
+            Assert.That(actual.Children, Contains.Item(new Node("AnimatedSprite2d", "AnimatedSprite2D", 
+                parent: actual, "."))
                 .UsingNodeComparer());
-            Assert.That(actual, Contains.Item(new Node("CollisionShape2d", "CollisionShape2D", "."))
+            Assert.That(actual.Children, Contains.Item(new Node("CollisionShape2d", "CollisionShape2D", 
+                parent: actual, "."))
                 .UsingNodeComparer());
         }
         [Test]
         public void GivenMainSample_CollectsNodesProperly()
         {
-            var actual = Run(LoadSample("Main")).Nodes;
+            var actual = Run(LoadSample("Main")).RootNode;
 
-            Assert.That(actual, Has.Exactly(11).Items);
-            Assert.That(actual, Contains.Item(new Node("Player", "Player", "."))
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual!.Children, Has.Exactly(10).Items);
+            Assert.That(actual.Children, Contains.Item(new Node("Player", "Player", parent: actual,"."))
                 .UsingNodeComparer());
-            Assert.That(actual, Contains.Item(new Node("MobTimer", "Timer", "."))
+            Assert.That(actual.Children, Contains.Item(new Node("MobTimer", "Timer", parent: actual,"."))
                 .UsingNodeComparer());
         }
         [Test]
         public void GivenNestedSample_CollectsNodesProperly()
         {
-            var actual = Run(LoadSample("Nested")).Nodes;
+            var actual = Run(LoadSample("Nested")).RootNode;
 
-            Assert.That(actual, Has.Exactly(6).Items);
-            Assert.That(actual, Contains.Item(new Node("FirstFollow", "PathFollow2D", "TextureRect/First"))
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual!.Children, Has.Exactly(2).Items);
+
+            var first = actual.SelectChild("TextureRect/First");
+            Assert.That(first, Is.Not.Null);
+            Assert.That(first!.Children, Contains.Item(new Node("FirstFollow", "PathFollow2D", first, "TextureRect/First"))
                 .UsingNodeComparer());
-            Assert.That(actual, Contains.Item(new Node("GruntiSprite", "Sprite2D", "TextureRect/First/FirstFollow/Grunti"))
+            var grunti = actual.SelectChild("TextureRect/First/FirstFollow/Grunti");
+            Assert.That(grunti, Is.Not.Null);
+            Assert.That(grunti!.Children, Contains.Item(new Node("GruntiSprite", "Sprite2D", grunti, 
+                "TextureRect/First/FirstFollow/Grunti"))
                 .UsingNodeComparer());
         }
         [Test]
@@ -96,6 +105,7 @@ internal class TscnListenerTest
         {
             const string input = """
                 [gd_scene load_steps=8 format=3]
+                [ext_resource type="Script" path="res://Main.cs" id="1_4hmc7"]
                 [sub_resource type="SpriteFrames" id="SpriteFrames_707dc"]
                 animations = [{
                 "loop": true,
@@ -106,16 +116,18 @@ internal class TscnListenerTest
                 "name": &"walk",
                 "speed": 5.0
                 }]
-                [node name="AnimatedSprite2d" type="AnimatedSprite2D" parent="."]
+                [node name="AnimatedSprite2d" type="AnimatedSprite2D"]
+                script = ExtResource("1_4hmc7")
                 scale = Vector2(0.5, 0.5)
                 sprite_frames = SubResource("SpriteFrames_707dc")
                 animation = &"up"
                 """;
 
             var listener = Run(input);
-            var actual = listener.Nodes.Single();
+            var actual = listener.RootNode;
 
-            Assert.That(actual.SubResources.Count, Is.EqualTo(1));
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual!.SubResources.Count, Is.EqualTo(1));
             Assert.That(actual.SubResources.Keys.Single(), Is.EqualTo("sprite_frames"));
             Assert.That(actual.SubResources.Values.Single(),
                  Is.SameAs(listener.SubResources.Values.Single()));
@@ -125,13 +137,18 @@ internal class TscnListenerTest
         {
             const string input = """
                 [gd_scene load_steps=8 format=3]
+                [ext_resource type="Script" path="res://Main.cs" id="1_4hmc7"]
                 [ext_resource type="PackedScene" uid="uid://g76r1u8cf6n7" path="res://Player.tscn" id="3_s3hlu"]
+                [node name="AnimatedSprite2d" type="AnimatedSprite2D"]
+                script = ExtResource("1_4hmc7")
                 [node name="Player" parent="." instance=ExtResource("3_s3hlu")]
             """;
-            var actual = Run(input).Nodes.SingleOrDefault();
+            var actual = Run(input).RootNode;
 
             Assert.That(actual, Is.Not.Null);
-            Assert.That(actual, Is.EqualTo(new Node("Player", "Player",".")).UsingNodeComparer());
+            var player = actual!.SelectChild("Player");
+            Assert.That(player, Is.Not.Null);
+            Assert.That(player, Is.EqualTo(new Node("Player", "Player", actual, ".")).UsingNodeComparer());
         }
 
         [Test]
@@ -139,33 +156,44 @@ internal class TscnListenerTest
         {
             const string input = """
             [gd_scene load_steps=8 format=3]
+            [ext_resource type="Script" path="res://Main.cs" id="1_4hmc7"]
+            [node name="AnimatedSprite2d" type="AnimatedSprite2D"]
+            script = ExtResource("1_4hmc7")
             [node name="Player" type="Area2D" parent="." groups=["alfa", "beta"]]
             metadata/_edit_group_ = true
             """;
 
-            var actual = Run(input).Nodes;
+            var actual = Run(input).RootNode;
 
             var expectedGroups = new HashSet<string>();
             expectedGroups.Add("alfa");
             expectedGroups.Add("beta");
-            Assert.That(actual.Count, Is.EqualTo(1));
-            Assert.That(actual.Single(),
-                Is.EqualTo(new Node("Player", "Area2D", ".", groups: expectedGroups)).UsingNodeComparer());
+
+            Assert.That(actual, Is.Not.Null);
+            var player = actual!.SelectChild("Player");
+            Assert.That(player, Is.Not.Null);
+            Assert.That(player,
+                Is.EqualTo(new Node("Player", "Area2D", actual, ".", groups: expectedGroups)).UsingNodeComparer());
         }
         [Test]
         public void WhenNodeHasParent_ReadsParentCorrectly()
         {
             const string input = """
                 [gd_scene load_steps=8 format=3]
+                [ext_resource type="Script" path="res://Main.cs" id="1_4hmc7"]
+                [node name="AnimatedSprite2d" type="AnimatedSprite2D"]
+                script = ExtResource("1_4hmc7")
+                [node name="TextureRect" type="TextureRect" parent="."]
+                [node name="First" type="Path2D" parent="TextureRect"]
                 [node name="FirstFollow" type="PathFollow2D" parent="TextureRect/First"]
                 """;
 
-            var actual = Run(input).Nodes;
+            var actual = Run(input).RootNode;
 
-            Assert.That(actual.Count, Is.EqualTo(1));
-            var node = actual.Single();
-            Assert.That(node.Parent, Is.EqualTo("TextureRect/First"));
-
+            Assert.That(actual, Is.Not.Null);
+            var allChildren = actual!.AllChildren.ToImmutableArray();
+            Assert.That(allChildren.Length, Is.EqualTo(3));
+            Assert.That(allChildren.Last().ParentPath, Is.EqualTo("TextureRect/First"));
         }
     }
     [TestFixture]

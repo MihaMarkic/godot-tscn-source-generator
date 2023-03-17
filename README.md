@@ -31,15 +31,18 @@ Sample generated code:
 ```csharp
 partial class Player
 {
-	public static class AnimatedSprite2dNode
+	public record struct AnimatedSprite2DNode
 	{
+		// ...
+		public AnimatedSprite2D Instance => owner.GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		// ...
 		public static class SpriteFrames
 		{
 			public static StringName Up { get; } = "up";
 			public static StringName Walk { get; } = "walk";
 		}
 	}
-	public Area2D GetAlienNode() => GetNode<Area2D>("Alien");
+	public AnimatedSprite2DNode AnimatedSprite2D => new AnimatedSprite2DNode(this);
 }
 
 public static partial class InputActions
@@ -53,9 +56,9 @@ public static partial class InputActions
 ```
 If you have a class named `Player` you can use 
 
-a) `GetAlienNode()` method without explicilty using generic argument or node name.
+a) `AnimatedSprite2D.Instance` method without explicilty using generic argument or node name.
 
-b) `node.Animation = AnimatedSprite2dNode.SpriteFrames.Up` instead of `node.Animation = "up"`
+b) `node.Animation = AnimatedSprite2DNode.SpriteFrames.Up` instead of `node.Animation = "up"`
 
 c) `if (Input.IsActionPressed(InputActions.MoveRight))` instead of `if (Input.IsActionPressed("move_right))`.
 Note that InputActions are global constants.
@@ -69,6 +72,7 @@ If this happens, code won't compile anymore and it would require update.
 * Animation name constants
 * Input actions names
 * Node groups
+* Supports node nesting
 
 ## Sample
 

@@ -1,3 +1,6 @@
+v.1.0.0-alpha6
+	- rewrite node generator to support nesting
+	- sample updated
 v.1.0.0-alpha5
 	- adds support for nested nodes
 v.1.0.0-alpha4
