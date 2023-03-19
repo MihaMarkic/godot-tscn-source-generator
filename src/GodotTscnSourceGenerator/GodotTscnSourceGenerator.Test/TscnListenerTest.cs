@@ -138,7 +138,7 @@ internal class TscnListenerTest
             const string input = """
                 [gd_scene load_steps=8 format=3]
                 [ext_resource type="Script" path="res://Main.cs" id="1_4hmc7"]
-                [ext_resource type="PackedScene" uid="uid://g76r1u8cf6n7" path="res://Player.tscn" id="3_s3hlu"]
+                [ext_resource type="PackedScene" uid="uid://g76r1u8cf6n7" path="res://player.tscn" id="3_s3hlu"]
                 [node name="AnimatedSprite2d" type="AnimatedSprite2D"]
                 script = ExtResource("1_4hmc7")
                 [node name="Player" parent="." instance=ExtResource("3_s3hlu")]

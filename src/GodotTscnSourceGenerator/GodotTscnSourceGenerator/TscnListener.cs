@@ -228,15 +228,17 @@ namespace GodotTscnSourceGenerator
         public static string GetClassName(string fileName)
         {
             string rawName = Path.GetFileNameWithoutExtension(fileName);
+            string className;
             if (rawName.Contains('.'))
             {
                 int index = rawName.IndexOf('.');
-                return rawName.Substring(0, index);
+                className = rawName.Substring(0, index);
             }
             else
             {
-                return rawName;
+                className = rawName;
             }
+            return className.ToPascalCase()!;
         }
     }
 
