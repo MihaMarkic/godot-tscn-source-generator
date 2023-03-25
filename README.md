@@ -1,6 +1,6 @@
 # godot-tscn-source-generator
 
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Righthand.GodotSourceGenerator)
+[![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Righthand.GodotSourceGenerator)](https://www.nuget.org/packages/Righthand.GodotSourceGenerator/)
 
 Generates C# source code within Visual Studio 2022 based on Godot project.godot and .tscn files.
 Based on [Righthand.GodotTscnParser](https://github.com/MihaMarkic/godot-tscn-parser) which in turn uses [ANTLR](https://www.antlr.org/).
