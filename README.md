@@ -53,6 +53,14 @@ public static partial class InputActions
 	public static StringName MoveDown { get; } = "move_down";
 	public static StringName StartGame { get; } = "start_game";
 }
+
+public static class Scenes
+{
+	public static readonly StringName Game = "res://Scenes/game.tscn";
+	public static readonly StringName Hud = "res://Scenes/hud.tscn";
+	public static readonly StringName Level = "res://Scenes/level.tscn";
+	public static readonly StringName Start = "res://Scenes/start.tscn";
+}
 ```
 If you have a class named `Player` you can use 
 
@@ -62,6 +70,9 @@ b) `node.Animation = AnimatedSprite2DNode.SpriteFrames.Up` instead of `node.Anim
 
 c) `if (Input.IsActionPressed(InputActions.MoveRight))` instead of `if (Input.IsActionPressed("move_right))`.
 Note that InputActions are global constants.
+
+d) `Scenes.Level` instead of `"res://Scenes/level.tscn"`. If scenes are not within a Scenes directory, that root 
+class will be PackedScenes and access will be like `PackedScenes.SomeDirectory.SomeScene`.
 
 Besides providing Intellisense auto completition, it also helps when nodes are renamed in .tscn file.
 If this happens, code won't compile anymore and it would require update.

@@ -1,3 +1,5 @@
+v.1.0.0-alpha8
+	- generates strong typed path to scenes resources
 v.1.0.0-alpha7
 	- fixes class name when .tscn name is not pascal cased
 v.1.0.0-alpha6

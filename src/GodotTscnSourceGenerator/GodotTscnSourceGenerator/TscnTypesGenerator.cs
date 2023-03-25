@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
@@ -55,7 +56,40 @@ namespace GodotTscnSourceGenerator
                     return;
                 }
             }
+            var scenesBuilder = new CodeStringBuilder();
+            if (context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.projectdir", out var projectDir))
+            {
+                var sceneNode = CreateSceneNodes(projectDir, tscnFiles.Select(f => f.Path).ToArray());
+                string startingPath = "";
+                if (sceneNode.Nodes.Count == 1 && sceneNode.Scenes.Count == 0 
+                    && sceneNode.Nodes.ContainsKey("Scenes"))
+                {
+                    sceneNode = sceneNode.Nodes.Values.Single();
+                    startingPath = "Scenes";
+                }
+                PopulateScenes(scenesBuilder, sceneNode, startingPath);
+                context.AddSource($"PackedScenes.g.cs", scenesBuilder.ToString());
+            }
         }
+
+        internal static void PopulateScenes(CodeStringBuilder sb, SceneNode sceneNode, string relativeDirectory)
+        {
+            string className = string.IsNullOrEmpty(sceneNode.Segment) ? "Scenes" : sceneNode.Segment;
+            sb.AppendLine($"public static class {className}");
+            sb.AppendStartBlock();
+            foreach (var node in sceneNode.Nodes.Values)
+            {
+                PopulateScenes(sb, node, Path.Combine(relativeDirectory, node.Segment));
+            }
+            foreach (string scene in sceneNode.Scenes)
+            {
+                string sceneName = Path.GetFileNameWithoutExtension(scene).ToPascalCase()!;
+                string path = string.IsNullOrEmpty(relativeDirectory) ? "": $"{relativeDirectory}/";
+                sb.AppendLine($"public static readonly StringName {sceneName} = \"res://{path}{scene}\";");
+            }
+            sb.AppendEndBlock();
+        }
+        
         public void ProcessGodotProjFile(GeneratorExecutionContext context)
         {
             var godotFile = context.AdditionalFiles
@@ -165,6 +199,34 @@ namespace GodotTscnSourceGenerator
         {
             return text.Replace(" ", "_");
         }
+
+        internal static SceneNode CreateSceneNodes(string projectDir, string[] paths)
+        {
+            var root = new SceneNode("");
+            foreach (string path in paths)
+            {
+                string relativePath = path.Substring(projectDir.Length);
+                string[] segments = relativePath.Split(Path.DirectorySeparatorChar);
+                var current = root;
+                for (int i = 0; i < segments.Length - 1; i++)
+                {
+                    string segment = segments[i];
+                    if (current.Nodes.TryGetValue(segment, out var node))
+                    {
+                        current = node;
+                    }
+                    else
+                    {
+                        node = new SceneNode(segment);
+                        current.Nodes.Add(segment, node);
+                        current = node;
+                    }
+                }
+                current.Scenes.Add(segments.Last());
+            }
+            return root;
+        }
+
         public void Initialize(GeneratorInitializationContext context)
         {
         }
