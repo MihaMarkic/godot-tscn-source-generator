@@ -84,6 +84,7 @@ If this happens, code won't compile anymore and it would require update.
 * Input actions names
 * Node groups
 * Supports node nesting
+* Strong typed script resources
 
 ## Sample
 
