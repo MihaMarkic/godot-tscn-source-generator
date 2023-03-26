@@ -1,3 +1,5 @@
+v.1.0.0-alpha10
+	- fixes strong typed resources path concatenation
 v.1.0.0-alpha9
 	- improves strong typed resources generator
 v.1.0.0-alpha8

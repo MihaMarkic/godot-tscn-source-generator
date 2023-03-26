@@ -79,7 +79,7 @@ namespace GodotTscnSourceGenerator
             sb.AppendStartBlock();
             foreach (var node in sceneNode.Nodes.Values)
             {
-                PopulateScenes(sb, node, Path.Combine(relativeDirectory, node.Segment));
+                PopulateScenes(sb, node, $"{relativeDirectory}/{node.Segment}");
             }
             foreach (string scene in sceneNode.Scenes)
             {
