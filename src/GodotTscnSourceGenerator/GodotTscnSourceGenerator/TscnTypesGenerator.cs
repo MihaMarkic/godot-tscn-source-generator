@@ -56,9 +56,9 @@ namespace GodotTscnSourceGenerator
                     return;
                 }
             }
-            var scenesBuilder = new CodeStringBuilder();
             if (context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.projectdir", out var projectDir))
             {
+                var scenesBuilder = new CodeStringBuilder();
                 var sceneNode = CreateSceneNodes(projectDir, tscnFiles.Select(f => f.Path).ToArray());
                 string startingPath = "";
                 if (sceneNode.Nodes.Count == 1 && sceneNode.Scenes.Count == 0 
@@ -67,6 +67,8 @@ namespace GodotTscnSourceGenerator
                     sceneNode = sceneNode.Nodes.Values.Single();
                     startingPath = "Scenes";
                 }
+                scenesBuilder.AppendLine("using Godot;");
+
                 PopulateScenes(scenesBuilder, sceneNode, startingPath);
                 context.AddSource($"PackedScenes.g.cs", scenesBuilder.ToString());
             }

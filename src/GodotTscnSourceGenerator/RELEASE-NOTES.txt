@@ -1,3 +1,5 @@
+v.1.0.0-alpha11
+	- fixes strong typed resources missing using statement
 v.1.0.0-alpha10
 	- fixes strong typed resources path concatenation
 v.1.0.0-alpha9
