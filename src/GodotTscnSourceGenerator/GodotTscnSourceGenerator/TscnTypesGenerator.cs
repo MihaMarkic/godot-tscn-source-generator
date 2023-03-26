@@ -150,7 +150,18 @@ namespace GodotTscnSourceGenerator
             if (isNotRoot)
             {
                 string resourceName = n.ParentPath == "." ? n.Name : $"{n.ParentPath}/{n.Name}";
-                sb.AppendLine($"public {n.Type} Instance => owner.GetNode<{n.Type}>(\"{resourceName}\");");
+                sb.AppendLine($"public {n.Type} Instance");
+                sb.AppendStartBlock();
+                sb.AppendLine("get");
+                sb.AppendStartBlock();
+                sb.AppendLine($"using (var key = (NodePath)\"{resourceName}\")");
+                sb.AppendStartBlock();
+                sb.AppendLine($"return owner.GetNode<{n.Type}>(key);");
+                sb.AppendEndBlock();
+                sb.AppendEndBlock();
+                sb.AppendEndBlock();
+                sb.AppendLine($"public string Name => \"{n.Name.GetSafeName()}\";");
+                sb.AppendLine($"public string FullPath => \"{resourceName}\";");
                 sb.AppendLine($"public {structName} ({owner} owner) => this.owner = owner;");
             }
             foreach (var child in n.Children)
