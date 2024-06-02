@@ -15,7 +15,7 @@
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" />
-    <PackageReference Include="Righthand.GodotTscnParser" Version="1.0.0-alpha9" />
+    <PackageReference Include="Righthand.GodotTscnParser" Version="1.0.0-beta.1" />
   </ItemGroup>
 
   <ItemGroup>
