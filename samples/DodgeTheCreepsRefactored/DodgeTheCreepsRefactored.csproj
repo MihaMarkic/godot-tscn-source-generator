@@ -15,6 +15,15 @@
     <AdditionalFiles Include="project.godot" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Righthand.GodotSourceGenerator" Version="1.0.0-alpha6" />
+    <PackageReference Include="Righthand.GodotSourceGenerator" Version="1.0.0-beta.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="Godot.SourceGenerators" Version="4.2.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="GodotSharp" Version="4.2.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="GodotSharpEditor" Version="4.2.2" />
   </ItemGroup>
 </Project>
