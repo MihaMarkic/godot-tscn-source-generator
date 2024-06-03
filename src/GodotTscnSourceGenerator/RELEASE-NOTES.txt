@@ -1,3 +1,7 @@
+v.1.0.0-beta.1
+	- promotes alpha.11 to beta
+v.1.0.0-alpha.11
+	- renames version to adhere to semantic versioning
 v.1.0.0-alpha11
 	- fixes strong typed resources missing using statement
 v.1.0.0-alpha10
