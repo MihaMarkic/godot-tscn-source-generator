@@ -1,3 +1,5 @@
+v.1.0.0-beta.2
+	- adds support for editable [parser]
 v.1.0.0-beta.1
 	- promotes alpha.11 to beta
 v.1.0.0-alpha.11

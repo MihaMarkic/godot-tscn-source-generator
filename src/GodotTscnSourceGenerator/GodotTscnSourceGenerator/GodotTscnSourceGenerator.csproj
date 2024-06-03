@@ -15,7 +15,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.0.0-beta.1</Version>
+    <Version>1.0.0-beta.2</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>(Please write the package release notes in "RELEASE NOTES.txt)</PackageReleaseNotes>
     <AssemblyName>Righthand.GodotSourceGenerator</AssemblyName>
@@ -53,13 +53,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Righthand.GodotTscnParser" Version="1.0.0-beta.1" GeneratePathProperty="true" PrivateAssets="all" />
-    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" GeneratePathProperty="true" PrivateAssets="all" />
      <!--Package the generator in the analyzer directory of the nuget package-->  
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
      <!--Package references--> 
