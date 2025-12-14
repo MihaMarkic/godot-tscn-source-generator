@@ -12,16 +12,16 @@ using Righthand.GodotTscnParser.Engine.Grammar;
 
 namespace GodotTscnSourceGenerator
 {
-    [Generator]
-    public class TscnTypesGenerator : ISourceGenerator
+    [Generator(LanguageNames.CSharp)]
+    public class TscnTypesGenerator : IIncrementalGenerator
     {
-        public void Execute(GeneratorExecutionContext context)
-        {
-            ProcessGodotProjFile(context);
-            ProcessTscnFiles(context);
-        }
+        // public void Execute(GeneratorExecutionContext context)
+        // {
+        //     ProcessGodotProjFile(context);
+        //     ProcessTscnFiles(context);
+        // }
 
-        public void ProcessTscnFiles(GeneratorExecutionContext context)
+        public void Initialize(GeneratorInitializationContext context)
         {
             var tscnFiles = context.AdditionalFiles
                 .Where(f => string.Equals(Path.GetExtension(f.Path), ".tscn", StringComparison.OrdinalIgnoreCase));
@@ -240,10 +240,6 @@ namespace GodotTscnSourceGenerator
             return root;
         }
 
-        public void Initialize(GeneratorInitializationContext context)
-        {
-        }
-
         TscnListener RunTscnListener(string text, Action<Diagnostic> reportDiagnostic, string filePath)
         {
             var input = new AntlrInputStream(text);
@@ -275,6 +271,11 @@ namespace GodotTscnSourceGenerator
             var listener = new GodotProjListener();
             ParseTreeWalker.Default.Walk(listener, tree);
             return listener;
+        }
+
+        public void Initialize(IncrementalGeneratorInitializationContext context)
+        {
+            throw new NotImplementedException();
         }
     }
 }

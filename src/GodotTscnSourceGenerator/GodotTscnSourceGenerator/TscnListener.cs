@@ -206,10 +206,9 @@ namespace GodotTscnSourceGenerator
             var animations = new List<Animation>();
             if (complexPairs.TryGetValue("animations", out var animationsContext))
             {
-                var objectArray = animationsContext.objectArray();
-                if (objectArray is not null)
+                if (animationsContext is not null)
                 {
-                    foreach (var o in objectArray.@object())
+                    foreach (var o in GetAllObjectContexts(animationsContext))
                     {
                         foreach (var p in o.property())
                         {
@@ -222,7 +221,30 @@ namespace GodotTscnSourceGenerator
                     }
                 }
             }
-            return animations.ToImmutableArray();
+            return [..animations];
+        }
+
+        internal static IEnumerable<ObjectContext> GetAllObjectContexts(ComplexValueContext complexValue)
+        {
+            var o = complexValue.@object(); 
+            if (o is not null)
+            {
+                yield return o;
+            }
+            else
+            {
+                var values = complexValue.complexValueArray()?.children;
+                if (values is not null)
+                {
+                    foreach (var childValue in values.OfType<ComplexValueContext>())
+                    {
+                        foreach (var childObject in GetAllObjectContexts(childValue))
+                        {
+                            yield return childObject;
+                        }
+                    }
+                }
+            }
         }
 
         public static string GetClassName(string fileName)
@@ -251,10 +273,12 @@ namespace GodotTscnSourceGenerator
             foreach (var p in context)
             {
                 // checks if value is string
-                var terminal = p.value().children[0] as TerminalNodeImpl;
-                if (terminal != null && terminal.Symbol.Type == STRING)
+                if (p.complexValue().children.SingleOrDefault() is ValueContext value)
                 {
-                    yield return new(p.children[0].GetText(), terminal.Symbol.Text.Trim('\"'));
+                    if (value.children.SingleOrDefault() is TerminalNodeImpl terminal && terminal.Symbol.Type == STRING)
+                    {
+                        yield return new(p.children[0].GetText(), terminal.Symbol.Text.Trim('\"'));
+                    }
                 }
             }
         }
