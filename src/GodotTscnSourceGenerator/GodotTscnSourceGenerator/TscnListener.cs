@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -15,18 +16,18 @@ namespace GodotTscnSourceGenerator
 {
     public class TscnListener : TscnBaseListener
     {
-        readonly Action<Diagnostic> reportDiagnostic;
-        readonly string fileName;
         public Node? RootNode { get; private set; }
         public Script? Script { get; private set; }
-        public Dictionary<string, Script> Scripts { get; } = new Dictionary<string, Script>();
-        public Dictionary<string, SubResource> SubResources { get; } = new Dictionary<string, SubResource>();
-        public Dictionary<string, ExtResource> ExtResources { get; } = new Dictionary<string, ExtResource>();
-        Node? lastNode;
+        public Dictionary<string, SubResource> SubResources { get; } = new();
+        private readonly Action<Diagnostic> _reportDiagnostic;
+        private readonly string _fileName;
+        private Dictionary<string, Script> Scripts { get; } = new();
+        private Dictionary<string, ExtResource> ExtResources { get; } = new();
+        private Node? _lastNode;
         public TscnListener(Action<Diagnostic> reportDiagnostic, string fileName)
         {
-            this.reportDiagnostic = reportDiagnostic;
-            this.fileName = fileName;
+            _reportDiagnostic = reportDiagnostic;
+            _fileName = fileName;
         }
         public override void ExitNode([NotNull] NodeContext context)
         {
@@ -61,7 +62,7 @@ namespace GodotTscnSourceGenerator
                         {
                             Name = sr.Key,
                             SubResource = SubResources[sr.Value],
-                        }).ToImmutableDictionary(p => p.Name, p => p.SubResource);
+                        }).ToFrozenDictionary(p => p.Name, p => p.SubResource);
                         HashSet<string> groups = new HashSet<string>();
                         if (pairs.TryGetValue("groups", out var groupsValue))
                         {
@@ -78,37 +79,37 @@ namespace GodotTscnSourceGenerator
                         if (pairs.TryGetValue("parent", out var parentValue))
                         {
                             string parentPath = parentValue.value().GetString();
-                            Node? parent = lastNode;
+                            Node? parent = _lastNode;
                             if (string.Equals(parentPath, ".", StringComparison.Ordinal))
                             {
                                 parent = RootNode;
                             }
-                            else if (!string.Equals(lastNode?.FullName, parentPath, System.StringComparison.Ordinal))
+                            else if (!string.Equals(_lastNode?.FullName, parentPath, StringComparison.Ordinal))
                             {
-                                while (parent is not null && !string.Equals(parent.FullName, parentPath, System.StringComparison.Ordinal))
+                                while (parent is not null && !string.Equals(parent.FullName, parentPath, StringComparison.Ordinal))
                                 {
                                     parent = parent.Parent;
                                 }
                             }
                             if (parent is not null)
                             {
-                                lastNode = new Node(name!, type!, parent, parentPath, subResources, groups);
-                                parent.Children.Add(lastNode);
+                                _lastNode = new Node(name!, type!, parent, parentPath, subResources, [..groups]);
+                                parent.Children.Add(_lastNode);
                             }
                             else
                             {
-                                reportDiagnostic(Diagnostic.Create(
+                                _reportDiagnostic(Diagnostic.Create(
                                     new DiagnosticDescriptor(
                                         "GTSG0002",
-                                        $"TSCN parsing error on {fileName}",
-                                        $"File {fileName}: Could not find parent node for node {name} with parent path {parentPath}",
+                                        $"TSCN parsing error on {_fileName}",
+                                        $"File {_fileName}: Could not find parent node for node {name} with parent path {parentPath}",
                                         "Parsing tscn",
                                         DiagnosticSeverity.Warning, true), null));
                             }
                         }
                         else if (script is not null)
                         {
-                            RootNode = lastNode = new Node(name!, type!, null, null, subResources, groups);
+                            RootNode = _lastNode = new Node(name!, type!, null, null, subResources, [..groups]);
                             Script = script;
                         }
                     }
@@ -117,7 +118,7 @@ namespace GodotTscnSourceGenerator
             base.ExitNode(context);
         }
 
-        internal string? GetClassNameFromInstance(ComplexValueContext context)
+        private string? GetClassNameFromInstance(ComplexValueContext context)
         {
             var extResourceRef = context.extResourceRef()?.resourceRef()?.GetString();
             if (extResourceRef is not null)
@@ -130,7 +131,7 @@ namespace GodotTscnSourceGenerator
             return null;
         }
 
-        internal Script? GetExtResourceScript(ComplexValueContext context)
+        private Script? GetExtResourceScript(ComplexValueContext context)
         {
             var extResourceRef = context.extResourceRef()?.resourceRef()?.GetString();
             if (extResourceRef is not null)
@@ -146,7 +147,6 @@ namespace GodotTscnSourceGenerator
         ImmutableDictionary<string, string> ExtractSubResourceReferences(
             ImmutableDictionary<string, ComplexValueContext> complexPairs)
         {
-            var result = new Dictionary<string, string>();
             var query = from cp in complexPairs
                         let srr = cp.Value.subResourceRef()
                         where srr is not null
@@ -200,23 +200,20 @@ namespace GodotTscnSourceGenerator
             base.ExitSubResource(context);
         }
 
-        public static ImmutableArray<Animation> ExtractAnimations(
+        private static ImmutableArray<Animation> ExtractAnimations(
             ImmutableDictionary<string, ComplexValueContext> complexPairs)
         {
             var animations = new List<Animation>();
             if (complexPairs.TryGetValue("animations", out var animationsContext))
             {
-                if (animationsContext is not null)
+                foreach (var o in GetAllObjectContexts(animationsContext))
                 {
-                    foreach (var o in GetAllObjectContexts(animationsContext))
+                    foreach (var p in o.property())
                     {
-                        foreach (var p in o.property())
+                        if (p.propertyName().GetString() == "name")
                         {
-                            if (p.propertyName().GetString() == "name")
-                            {
-                                var reference = p.complexValue().value().@ref().propertyName().GetString();
-                                animations.Add(new Animation(reference));
-                            }
+                            var reference = p.complexValue().value().@ref().propertyName().GetString();
+                            animations.Add(new Animation(reference));
                         }
                     }
                 }
@@ -224,7 +221,7 @@ namespace GodotTscnSourceGenerator
             return [..animations];
         }
 
-        internal static IEnumerable<ObjectContext> GetAllObjectContexts(ComplexValueContext complexValue)
+        private static IEnumerable<ObjectContext> GetAllObjectContexts(ComplexValueContext complexValue)
         {
             var o = complexValue.@object(); 
             if (o is not null)
@@ -266,47 +263,55 @@ namespace GodotTscnSourceGenerator
 
     public static class ListenerExtensions
     {
-        internal static ImmutableDictionary<string, string> GetStringPairs(this PairContext[] context)
-            => context.EnumerateStringPairs().ToImmutableDictionary(p => p.Key, p => p.Value);
-        internal static IEnumerable<KeyValuePair<string, string>> EnumerateStringPairs(this PairContext[] context)
+        extension(PairContext[] context)
         {
-            foreach (var p in context)
+            internal ImmutableDictionary<string, string> GetStringPairs()
+                => context.EnumerateStringPairs().ToImmutableDictionary(p => p.Key, p => p.Value);
+
+            private IEnumerable<KeyValuePair<string, string>> EnumerateStringPairs()
             {
-                // checks if value is string
-                if (p.complexValue().children.SingleOrDefault() is ValueContext value)
+                foreach (var p in context)
                 {
-                    if (value.children.SingleOrDefault() is TerminalNodeImpl terminal && terminal.Symbol.Type == STRING)
+                    // checks if value is string
+                    if (p.complexValue().children.SingleOrDefault() is ValueContext value)
                     {
-                        yield return new(p.children[0].GetText(), terminal.Symbol.Text.Trim('\"'));
+                        if (value.children.SingleOrDefault() is TerminalNodeImpl terminal && terminal.Symbol.Type == STRING)
+                        {
+                            yield return new(p.children[0].GetText(), terminal.Symbol.Text.Trim('\"'));
+                        }
                     }
                 }
             }
         }
-        internal static ImmutableDictionary<string, ComplexValueContext> GetComplexPairs(this ComplexPairContext[] context)
-            => context.EnumerateComplexPairs().ToImmutableDictionary(p => p.Key, p => p.Value);
-        internal static IEnumerable<KeyValuePair<string, ComplexValueContext>> EnumerateComplexPairs(
-            this ComplexPairContext[] context)
+
+        extension(ComplexPairContext[] context)
         {
-            foreach (var p in context)
+            internal ImmutableDictionary<string, ComplexValueContext> GetComplexPairs()
+                => context.EnumerateComplexPairs().ToImmutableDictionary(p => p.Key, p => p.Value);
+
+            private IEnumerable<KeyValuePair<string, ComplexValueContext>> EnumerateComplexPairs()
             {
-                string name = p.complexPairName().GetText();
-                yield return new(name, p.complexValue());
-                // checks if value is string
-                //var terminal = p.value().children[0] as TerminalNodeImpl;
-                //if (terminal != null && terminal.Symbol.Type == STRING)
-                //{
-                //    yield return new(p.children[0].GetText(), terminal.Symbol.Text.Trim('\"'));
-                //}
+                foreach (var p in context)
+                {
+                    var name = p.complexPairName().GetText();
+                    yield return new(name, p.complexValue());
+                    // checks if value is string
+                    //var terminal = p.value().children[0] as TerminalNodeImpl;
+                    //if (terminal != null && terminal.Symbol.Type == STRING)
+                    //{
+                    //    yield return new(p.children[0].GetText(), terminal.Symbol.Text.Trim('\"'));
+                    //}
+                }
             }
         }
+
         internal static string GetString(this RuleContext context)
         {
-            var terminal = context.GetChild(0) as TerminalNodeImpl;
-            if (terminal != null && terminal.Symbol.Type == STRING)
+            if (context.GetChild(0) is TerminalNodeImpl terminal && terminal.Symbol.Type == STRING)
             {
                 return terminal.Symbol.Text.Trim('\"');
             }
-            throw new System.Exception($"{context.GetText()} is not a STRING");
+            throw new Exception($"{context.GetText()} is not a STRING");
         }
     }
 }

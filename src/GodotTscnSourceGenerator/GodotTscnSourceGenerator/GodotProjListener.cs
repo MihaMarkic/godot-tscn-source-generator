@@ -8,7 +8,7 @@ namespace GodotTscnSourceGenerator
 {
     public class GodotProjListener : GodotProjBaseListener
     {
-        public HashSet<InputAction> InputActions { get; } = new HashSet<InputAction>();
+        public HashSet<InputAction> InputActions { get; } = new();
 
         public override void ExitSection([NotNull] GodotProjParser.SectionContext context)
         {

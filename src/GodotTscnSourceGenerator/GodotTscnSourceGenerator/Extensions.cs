@@ -1,50 +1,58 @@
 ﻿using System.Text;
-using Antlr4.Runtime.Misc;
 
 namespace GodotTscnSourceGenerator
 {
     public static class Extensions
     {
-        public static string? ToPascalCase(this string? text)
+        extension(string? text)
         {
-            if (text is null)
+            public string? ToPascalCase()
             {
-                return null;
-            }
-            var sb = new StringBuilder(text.Length);
-            bool isUpper = true;
-            foreach (var c in text)
-            {
-                if (!char.IsLetterOrDigit(c))
+                if (text is null)
                 {
-                    isUpper = true;
+                    return null;
                 }
-                else
+                var sb = new StringBuilder(text.Length);
+                bool isUpper = true;
+                foreach (var c in text)
                 {
-                    if (isUpper)
+                    if (!char.IsLetterOrDigit(c))
                     {
-                        sb.Append(char.ToUpper(c));
-                        isUpper = false;
+                        isUpper = true;
                     }
                     else
                     {
-                        sb.Append(c);
+                        if (isUpper)
+                        {
+                            sb.Append(char.ToUpper(c));
+                            isUpper = false;
+                        }
+                        else
+                        {
+                            sb.Append(c);
+                        }
                     }
                 }
+                return sb.ToString();
             }
-            return sb.ToString();
         }
-        public static string GetSafeName(this string text)
+        extension(string text)
         {
-            return text.Replace(" ", "_");
-        }
-        public static void AppendLine(this StringBuilder sb, int offset, string value)
-        {
-            for (int i=0; i < offset; i++)
+            public string GetSafeName()
             {
-                sb.Append('\t');
+                return text.Replace(" ", "_");
             }
-            sb.AppendLine(value);
+        }
+        extension(StringBuilder sb)
+        {
+            public void AppendLine(int offset, string value)
+            {
+                for (int i=0; i < offset; i++)
+                {
+                    sb.Append('\t');
+                }
+                sb.AppendLine(value);
+            }
         }
     }
 }
