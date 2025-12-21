@@ -1,4 +1,5 @@
-﻿using Antlr4.Runtime;
+﻿using System.Collections.Frozen;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using GodotTscnSourceGenerator.Models;
 using NUnit.Framework;
@@ -165,9 +166,11 @@ internal class TscnListenerTest
 
             var actual = Run(input).RootNode;
 
-            var expectedGroups = new HashSet<string>();
-            expectedGroups.Add("alfa");
-            expectedGroups.Add("beta");
+            var expectedGroups = new HashSet<string>
+            {
+                "alfa",
+                "beta"
+            }.ToFrozenSet();
 
             Assert.That(actual, Is.Not.Null);
             var player = actual!.SelectChild("Player");

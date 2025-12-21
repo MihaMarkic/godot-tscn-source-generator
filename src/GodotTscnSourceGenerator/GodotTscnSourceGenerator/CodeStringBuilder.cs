@@ -4,23 +4,23 @@ namespace GodotTscnSourceGenerator
 {
     public class CodeStringBuilder
     {
-        readonly StringBuilder sb = new StringBuilder();
-        int offset;
+        private readonly StringBuilder _sb = new();
+        private int _offset;
 
         public void AppendStartBlock()
         {
-            sb.AppendLine(offset, "{");
-            offset++;
+            _sb.AppendLine(_offset, "{");
+            _offset++;
         }
         public void AppendEndBlock()
         {
-            offset--;
-            sb.AppendLine(offset, "}");
+            _offset--;
+            _sb.AppendLine(_offset, "}");
         }
-        public void AppendLine(string value) => sb.AppendLine(offset, value);
-        public void IncOffset() => offset++;
-        public void DecOffset() => offset--;
+        public void AppendLine(string value) => _sb.AppendLine(_offset, value);
+        public void IncOffset() => _offset++;
+        public void DecOffset() => _offset--;
 
-        public override string ToString() => sb.ToString();
+        public override string ToString() => _sb.ToString();
     }
 }
