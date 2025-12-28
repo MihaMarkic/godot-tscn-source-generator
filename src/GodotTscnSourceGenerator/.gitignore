@@ -274,4 +274,3 @@ nogit.config
 !/src/Globus.Kiosk/Binaries/*.dll
 nuget.config
 /samples/out
-.godot

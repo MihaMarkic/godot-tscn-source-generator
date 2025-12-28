@@ -20,4 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\GodotTscnSourceGenerator\GodotTscnSourceGenerator\GodotTscnSourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+  </ItemGroup>
 </Project>
