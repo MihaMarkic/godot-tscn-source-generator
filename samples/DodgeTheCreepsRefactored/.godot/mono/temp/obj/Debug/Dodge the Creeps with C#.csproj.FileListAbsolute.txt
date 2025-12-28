@@ -1,0 +1,36 @@
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/bin/Debug/Dodge the Creeps with C#.deps.json
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/bin/Debug/Dodge the Creeps with C#.runtimeconfig.json
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/bin/Debug/Dodge the Creeps with C#.dll
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/bin/Debug/Dodge the Creeps with C#.pdb
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/bin/Debug/GodotSharp.dll
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/bin/Debug/GodotSharpEditor.dll
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.csproj.AssemblyReference.cache
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.GeneratedMSBuildEditorConfig.editorconfig
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.AssemblyInfoInputs.cache
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.AssemblyInfo.cs
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.csproj.CoreCompileInputs.cache
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.sourcelink.json
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge th.342244DB.Up2Date
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.dll
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/refint/Dodge the Creeps with C#.dll
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.pdb
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.genruntimeconfig.cache
+/home/miha/projects/github/godot-demo-projects/mono/dodge_the_creeps/.godot/mono/temp/obj/Debug/ref/Dodge the Creeps with C#.dll
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/bin/Debug/Dodge the Creeps with C#.deps.json
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/bin/Debug/Dodge the Creeps with C#.runtimeconfig.json
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/bin/Debug/Dodge the Creeps with C#.dll
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/bin/Debug/Dodge the Creeps with C#.pdb
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/bin/Debug/GodotSharp.dll
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/bin/Debug/GodotSharpEditor.dll
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.csproj.AssemblyReference.cache
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.GeneratedMSBuildEditorConfig.editorconfig
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.AssemblyInfoInputs.cache
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.AssemblyInfo.cs
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.csproj.CoreCompileInputs.cache
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.sourcelink.json
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge th.342244DB.Up2Date
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.dll
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/refint/Dodge the Creeps with C#.dll
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.pdb
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/Dodge the Creeps with C#.genruntimeconfig.cache
+/home/miha/projects/rthand/godot-tscn-source-generator/samples/dodge_the_creeps/.godot/mono/temp/obj/Debug/ref/Dodge the Creeps with C#.dll

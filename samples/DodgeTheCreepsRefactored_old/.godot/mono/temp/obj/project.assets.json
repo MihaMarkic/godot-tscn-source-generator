@@ -1,0 +1,209 @@
+{
+  "version": 3,
+  "targets": {
+    "net6.0": {
+      "Godot.SourceGenerators/4.0.0": {
+        "type": "package",
+        "build": {
+          "build/Godot.SourceGenerators.props": {}
+        }
+      },
+      "GodotSharp/4.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/GodotSharp.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/GodotSharp.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "GodotSharpEditor/4.0.0": {
+        "type": "package",
+        "dependencies": {
+          "GodotSharp": "4.0.0"
+        },
+        "compile": {
+          "lib/net6.0/GodotSharpEditor.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/GodotSharpEditor.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Righthand.GodotSourceGenerator/1.0.0-beta.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Righthand.GodotSourceGenerator.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Righthand.GodotSourceGenerator.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Godot.SourceGenerators/4.0.0": {
+      "sha512": "zSi0z7DupoieN0696QrSyFC/2rEFSyg1bCv+ap4asic8ZcrIUmxdfQrNqdhMjlVhGa3Wd/Zj9IK77H0MrkxSiQ==",
+      "type": "package",
+      "path": "godot.sourcegenerators/4.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/dotnet/cs/Godot.SourceGenerators.dll",
+        "build/Godot.SourceGenerators.props",
+        "godot.sourcegenerators.4.0.0.nupkg.sha512",
+        "godot.sourcegenerators.nuspec"
+      ]
+    },
+    "GodotSharp/4.0.0": {
+      "sha512": "EVUiU/QGwWNRKoQxBi3qmOG/FYRYJJTHp+e2FtVZup62kYyGTcI6QEQayXUydZ0HMN41+hA3TOVt9yT5bGP3FQ==",
+      "type": "package",
+      "path": "godotsharp/4.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "godotsharp.4.0.0.nupkg.sha512",
+        "godotsharp.nuspec",
+        "lib/net6.0/GodotSharp.dll",
+        "lib/net6.0/GodotSharp.xml"
+      ]
+    },
+    "GodotSharpEditor/4.0.0": {
+      "sha512": "TPWtEAi83fGNygaxlA/dCfcpIrs7vQjzZSk+p3GOLJBYr5qMcemIqtKIAUXIAen22xGp3AXU5JkhxRBb4EbEgA==",
+      "type": "package",
+      "path": "godotsharpeditor/4.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "godotsharpeditor.4.0.0.nupkg.sha512",
+        "godotsharpeditor.nuspec",
+        "lib/net6.0/GodotSharpEditor.dll",
+        "lib/net6.0/GodotSharpEditor.xml"
+      ]
+    },
+    "Righthand.GodotSourceGenerator/1.0.0-beta.1": {
+      "sha512": "QQphBoKJI6qYOHNdQeDQeFw9EIMaPpVWSXfs3otXnydhWTpSTtAdzmmcXHQ37bQdMUf93UEkPWAC5njW8WYHsw==",
+      "type": "package",
+      "path": "righthand.godotsourcegenerator/1.0.0-beta.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "README.md",
+        "analyzers/dotnet/cs/Antlr4.Runtime.Standard.dll",
+        "analyzers/dotnet/cs/Righthand.GodotSourceGenerator.dll",
+        "analyzers/dotnet/cs/Righthand.GodotTscnParser.dll",
+        "lib/netstandard2.0/Righthand.GodotSourceGenerator.dll",
+        "righthand.godotsourcegenerator.1.0.0-beta.1.nupkg.sha512",
+        "righthand.godotsourcegenerator.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net6.0": [
+      "Godot.SourceGenerators >= 4.0.0",
+      "GodotSharp >= 4.0.0",
+      "GodotSharpEditor >= 4.0.0",
+      "Righthand.GodotSourceGenerator >= 1.0.0-beta.1"
+    ]
+  },
+  "packageFolders": {
+    "/home/miha/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/home/miha/projects/rthand/godot-tscn-source-generator/samples/DodgeTheCreepsRefactored/DodgeTheCreepsRefactored.csproj",
+      "projectName": "DodgeTheCreepsRefactored",
+      "projectPath": "/home/miha/projects/rthand/godot-tscn-source-generator/samples/DodgeTheCreepsRefactored/DodgeTheCreepsRefactored.csproj",
+      "packagesPath": "/home/miha/.nuget/packages/",
+      "outputPath": "/home/miha/projects/rthand/godot-tscn-source-generator/samples/DodgeTheCreepsRefactored/.godot/mono/temp/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/home/miha/projects/rthand/godot-tscn-source-generator/nuget.config",
+        "/home/miha/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net6.0"
+      ],
+      "sources": {
+        "/home/miha/projects/rthand/godot-tscn-parser/src/GodotTscnParser/GodotTscnParser.Engine/bin/Release": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.100"
+    },
+    "frameworks": {
+      "net6.0": {
+        "targetAlias": "net6.0",
+        "dependencies": {
+          "Godot.SourceGenerators": {
+            "target": "Package",
+            "version": "[4.0.0, )"
+          },
+          "GodotSharp": {
+            "target": "Package",
+            "version": "[4.0.0, )"
+          },
+          "GodotSharpEditor": {
+            "target": "Package",
+            "version": "[4.0.0, )"
+          },
+          "Righthand.GodotSourceGenerator": {
+            "target": "Package",
+            "version": "[1.0.0-beta.1, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          }
+        ],
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/home/miha/.dotnet/sdk/10.0.101/RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

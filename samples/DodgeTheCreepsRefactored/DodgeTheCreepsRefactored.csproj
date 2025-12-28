@@ -1,29 +1,23 @@
-<Project Sdk="Godot.NET.Sdk/4.0.0">
+<Project Sdk="Godot.NET.Sdk/4.5.1">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RootNamespace>DodgeTheCreeps</RootNamespace>
   </PropertyGroup>
+<!--  <ItemGroup>-->
+<!--    <PackageReference Include="Righthand.GodotSourceGenerator" Version="1.1.0-beta.1" />-->
+<!--  </ItemGroup>-->
   <ItemGroup>
-    <AdditionalFiles Include="Main.tscn" />
-    <AdditionalFiles Include="Mob.tscn" />
-    <AdditionalFiles Include="Player.tscn" />
-  </ItemGroup>
-  <ItemGroup>
-    <AdditionalFiles Include="Hud.tscn" />
+    <None Include="**/*.tscn" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="project.godot" />
+    <AdditionalFiles Include="Main.tscn" />
+    <AdditionalFiles Include="Mob.tscn" />
+    <AdditionalFiles Include="Player.tscn" />
+    <AdditionalFiles Include="HUD.tscn" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Righthand.GodotSourceGenerator" Version="1.0.0-beta.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="Godot.SourceGenerators" Version="4.2.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="GodotSharp" Version="4.2.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="GodotSharpEditor" Version="4.2.2" />
+    <ProjectReference Include="..\..\src\GodotTscnSourceGenerator\GodotTscnSourceGenerator\GodotTscnSourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 </Project>

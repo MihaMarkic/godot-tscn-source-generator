@@ -1,95 +1,84 @@
 using Godot;
-using System;
 
 public partial class Main : Node
 {
 #pragma warning disable 649
-	// We assign this in the editor, so we don't need the warning about not being assigned.
-	[Export]
-	public PackedScene MobScene;
+    // We assign this in the editor, so we don't need the warning about not being assigned.
+    [Export]
+    public PackedScene MobScene { get; set; }
 #pragma warning restore 649
-	public int Score;
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
-	
-	void GameOver()
-	{
-		Music.Instance.Stop();
-		DeathSound.Instance.Play();
+    private int _score;
+
+    public void GameOver()
+    {
+        Music.Instance.Stop();
+        DeathSound.Instance.Play();
         MobTimer.Instance.Stop();
-		ScoreTimer.Instance.Stop();
-		Hud.Instance.ShowGameOver();
-	}
-	
-	public void NewGame()
-	{
-		GetTree().CallGroup(Mob.Groups.Mobs, Node.MethodName.QueueFree);
+        ScoreTimer.Instance.Stop();
+        HUD.Instance.ShowGameOver();
+    }
 
-		Score = 0;
+    public void NewGame()
+    {
+        GetTree().CallGroup(Mob.Groups.Mobs, Node.MethodName.QueueFree);
 
-		var player = Player.Instance;
-		var startPosition = StartPosition.Instance;
-		player.Start(startPosition.Position);
+        _score = 0;
 
-		GetNode<Timer>("StartTimer").Start();
+        var player = Player.Instance;
+        var startPosition = StartPosition.Instance;
+        player.Start(startPosition.Position);
 
-		var hud = Hud.Instance;
-		hud.UpdateScore(Score);
-		hud.ShowMessage("Get Ready!");
+        GetNode<Timer>("StartTimer").Start();
 
-		Music.Instance.Play();
-	}
+        var hud = HUD.Instance;
+        hud.UpdateScore(_score);
+        hud.ShowMessage("Get Ready!");
 
-	void OnMobTimerTimeout()
-	{
-		// Note: Normally it is best to use explicit types rather than the `var`
-		// keyword. However, var is acceptable to use here because the types are
-		// obviously Mob and PathFollow2D, since they appear later on the line.
+        Music.Instance.Play();
+    }
 
-		// Create a new instance of the Mob scene.
-		var mob = MobScene.Instantiate<Mob>();
+    private void OnStartTimerTimeout()
+    {
+        MobTimer.Instance.Start();
+        ScoreTimer.Instance.Start();
+    }
 
-		// Choose a random location on Path2D.
-		var mobSpawnLocation = GetNode<PathFollow2D>("MobPath/MobSpawnLocation");
-		mobSpawnLocation.ProgressRatio = GD.Randf();
+    private void OnScoreTimerTimeout()
+    {
+        _score++;
+        HUD.Instance.UpdateScore(_score);
+    }
 
-		// Set the mob's direction perpendicular to the path direction.
-		float direction = mobSpawnLocation.Rotation + Mathf.Pi / 2;
+    // We also specified this function name in PascalCase in the editor's connection window.
+    private void OnMobTimerTimeout()
+    {
+        // Note: Normally it is best to use explicit types rather than the `var`
+        // keyword. However, var is acceptable to use here because the types are
+        // obviously Mob and PathFollow2D, since they appear later on the line.
 
-		// Set the mob's position to a random location.
-		mob.Position = mobSpawnLocation.Position;
+        // Create a new instance of the Mob scene.
+        var mob = MobScene.Instantiate<Mob>();
 
-		// Add some randomness to the direction.
-		direction += (float)GD.RandRange(-Mathf.Pi / 4, Mathf.Pi / 4);
-		mob.Rotation = direction;
+        // Choose a random location on Path2D.
+        var mobSpawnLocation = GetNode<PathFollow2D>("MobPath/MobSpawnLocation");
+        mobSpawnLocation.ProgressRatio = GD.Randf();
 
-		// Choose the velocity.
-		var velocity = new Vector2((float)GD.RandRange(150.0, 250.0), 0);
-		mob.LinearVelocity = velocity.Rotated(direction);
+        // Set the mob's direction perpendicular to the path direction.
+        float direction = mobSpawnLocation.Rotation + Mathf.Pi / 2;
 
-		// Spawn the mob by adding it to the Main scene.
-		AddChild(mob);
-	}
+        // Set the mob's position to a random location.
+        mob.Position = mobSpawnLocation.Position;
 
+        // Add some randomness to the direction.
+        direction += (float)GD.RandRange(-Mathf.Pi / 4, Mathf.Pi / 4);
+        mob.Rotation = direction;
 
-	void OnScoreTimerTimeout()
-	{
-		Score++;
-		Hud.Instance.UpdateScore(Score);
-	}
+        // Choose the velocity.
+        var velocity = new Vector2((float)GD.RandRange(150.0, 250.0), 0);
+        mob.LinearVelocity = velocity.Rotated(direction);
 
-
-	void OnStartTimerTimeout()
-	{
-		MobTimer.Instance.Start();
-		ScoreTimer.Instance.Start();
-	}
-
+        // Spawn the mob by adding it to the Main scene.
+        AddChild(mob);
+    }
 }
