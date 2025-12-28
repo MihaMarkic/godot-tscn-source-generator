@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.IO;
+using System.Text;
 
 namespace GodotTscnSourceGenerator
 {
@@ -18,6 +20,15 @@ namespace GodotTscnSourceGenerator
             _sb.AppendLine(_offset, "}");
         }
         public void AppendLine(string value) => _sb.AppendLine(_offset, value);
+
+        public void AppendLines(string value)
+        {
+            using var reader = new StringReader(value);
+            while (reader.ReadLine() is { } line)
+            {
+                AppendLine(line);
+            }
+        }
         public void IncOffset() => _offset++;
         public void DecOffset() => _offset--;
 

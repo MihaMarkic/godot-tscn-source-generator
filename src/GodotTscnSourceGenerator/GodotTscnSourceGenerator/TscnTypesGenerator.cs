@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Frozen;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
@@ -68,22 +69,27 @@ namespace GodotTscnSourceGenerator
             IncrementalValuesProvider<AdditionalText> tscnFiles = context.AdditionalTextsProvider
                 .Where(static f => string.Equals(Path.GetExtension(f.Path), ".tscn", StringComparison.OrdinalIgnoreCase));
 
-            IncrementalValuesProvider<(string File, string Content)> tscnFilesContents = tscnFiles
-                .Select((f, ct) => (File: f.Path, Content: f.GetText(ct)!.ToString()));
-
-            var allTscnFilesContents = tscnFilesContents.Collect();
-
-            var combined = allTscnFilesContents.Combine(context.AnalyzerConfigOptionsProvider);
+             IncrementalValuesProvider<(string File, string Content)> tscnFilesContents = tscnFiles
+                 .Select((f, ct) => (File: f.Path, Content: f.GetText(ct)!.ToString()));
+            
+             var allTscnFilesContents = tscnFilesContents.Collect();
+            
+             var combined = allTscnFilesContents.Combine(context.AnalyzerConfigOptionsProvider);
 
             context.RegisterSourceOutput(combined, ProcessAllTscnFiles);
-            
         }
-        private void ProcessAllTscnFiles(SourceProductionContext context, (ImmutableArray<(string File, string Content)> TscnFiles, AnalyzerConfigOptionsProvider AnalyzerConfigOptionsProvider) data)
+
+        private void ProcessAllTscnFiles(SourceProductionContext context, 
+            (
+                ImmutableArray<(string File, string Content)> TscnFiles, 
+                AnalyzerConfigOptionsProvider AnalyzerConfigOptionsProvider
+            ) data)
         {
             var (tscnFiles, analyzerConfigOptionsProvider) = data;
             if (analyzerConfigOptionsProvider.GlobalOptions.TryGetValue("build_property.projectdir", out var projectDir))
             {
                 var scenesBuilder = new CodeStringBuilder();
+
                 var sceneNode = CreateSceneNodes(projectDir, [..tscnFiles.Select(f => f.File)]);
                 string startingPath = "";
                 if (sceneNode.Nodes.Count == 1 && sceneNode.Scenes.Count == 0 
@@ -161,6 +167,28 @@ namespace GodotTscnSourceGenerator
             }
         }
 
+        /// <summary>
+        /// Tries to convert Godot script types to C#
+        /// </summary>
+        /// <param name="typeName"></param>
+        /// <returns></returns>
+        public static string FixTypeName(string typeName)
+        {
+            if (typeName.Length < 4)
+            {
+                return typeName;
+            }
+            Span<char> chars = stackalloc char[typeName.Length];
+            for (int i = 0; i < typeName.Length; i++)
+            {
+                char c = typeName[i];
+                bool castToLowercase = char.IsUpper(c) && i > 0 && i < typeName.Length-1 && char.IsUpper(typeName[i + 1]); 
+                chars[i] = castToLowercase ? char.ToLower(c): c;
+            }
+
+            return chars.ToString();
+        }
+
         private static void PopulateNodeResources(CodeStringBuilder sb, string owner, Node n)
         {
             bool isNotRoot = n.Parent is not null;
@@ -182,14 +210,15 @@ namespace GodotTscnSourceGenerator
             if (isNotRoot)
             {
                 var resourceName = n.ParentPath == "." ? n.Name : $"{n.ParentPath}/{n.Name}";
+                var typeName = FixTypeName(n.Type);
                 var text = $$"""
-                              public {{n.Type}} Instance
+                              public {{typeName}} Instance
                               {
                                   get
                                   {
                                     using (var key = (NodePath)"{{resourceName}}")
                                     {
-                                        return owner.GetNode<{{n.Type}}>(key);
+                                        return owner.GetNode<{{typeName}}>(key);
                                     }
                                   }
                               }
@@ -197,7 +226,7 @@ namespace GodotTscnSourceGenerator
                               public string FullPath => "{{resourceName}}";
                               public {{structName}} ({{owner}} owner) => this.owner = owner;
                               """;
-                sb.AppendLine(text);
+                sb.AppendLines(text);
             }
             foreach (var child in n.Children)
             {
