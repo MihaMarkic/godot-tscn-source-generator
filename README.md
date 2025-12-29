@@ -64,7 +64,7 @@ public static class Scenes
 ```
 If you have a class named `Player` you can use 
 
-a) `AnimatedSprite2D.Instance` method without explicilty using generic argument or node name.
+a) `AnimatedSprite2D.Instance` method without explicitly using generic argument or node name.
 
 b) `node.Animation = AnimatedSprite2DNode.SpriteFrames.Up` instead of `node.Animation = "up"`
 
@@ -74,8 +74,23 @@ Note that InputActions are global constants.
 d) `Scenes.Level` instead of `"res://Scenes/level.tscn"`. If scenes are not within a Scenes directory, that root 
 class will be PackedScenes and access will be like `PackedScenes.SomeDirectory.SomeScene`.
 
-Besides providing Intellisense auto completition, it also helps when nodes are renamed in .tscn file.
-If this happens, code won't compile anymore and it would require update.
+Besides providing Intellisense auto competition, it also helps when nodes are renamed in .tscn file.
+If this happens, code won't compile anymore, and it would require update.
+
+## When Scenes directory is not at the root of the project
+
+If `Scenes` directory is not at the root of the project, you might set
+relative directory to avoid unnecessary nesting in `Scenes` class.
+This is done through a .csproj property like the sample below, when `Scenes` are located in `src` subdirectory:
+```xml
+<PropertyGroup>
+    <TscnGeneratorGodotRoot>src/</TscnGeneratorGodotRoot>
+</PropertyGroup>
+<ItemGroup>
+    <CompilerVisibleProperty Include="TscnGeneratorGodotRoot" />
+</ItemGroup>
+```
+Make sure you include both TscnGeneratorGodotRoot and CompilerVisibleProperty, otherwise it won't work.
 
 ## Generated code
 

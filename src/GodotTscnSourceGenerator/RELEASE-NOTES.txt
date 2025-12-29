@@ -1,3 +1,6 @@
+v1.1.1-beta.1
+    - If Scenes directory is not at the root of the project, then PackedScenes.g.cs will generate more nested structure.
+      To avoid that, set <TscnGeneratorGodotRoot> set property to i.e. src/ to avoid unnecessary nesting.
 v1.1.0-beta.2
     - fixes project.godot parsing (complexPairName)
     - tries to convert godot script type names to C# type names

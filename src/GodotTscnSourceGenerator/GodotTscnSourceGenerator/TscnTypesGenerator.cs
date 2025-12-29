@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using GodotTscnSourceGenerator.Models;
@@ -73,32 +74,56 @@ namespace GodotTscnSourceGenerator
                  .Select((f, ct) => (File: f.Path, Content: f.GetText(ct)!.ToString()));
             
              var allTscnFilesContents = tscnFilesContents.Collect();
+             
+             IncrementalValueProvider<string?> rootGodot = context
+                 .AnalyzerConfigOptionsProvider
+                 // Retrieve the RootNamespace property
+                 .Select((AnalyzerConfigOptionsProvider c, CancellationToken _) =>
+                     c.GlobalOptions.TryGetValue("build_property.TscnGeneratorGodotRoot", out var nameSpace)
+                         ? nameSpace
+                         : null);
+
+            var metadataProvider = context.AnalyzerConfigOptionsProvider.Combine(rootGodot);
             
-             var combined = allTscnFilesContents.Combine(context.AnalyzerConfigOptionsProvider);
+             var combined = allTscnFilesContents.Combine(metadataProvider);
 
             context.RegisterSourceOutput(combined, ProcessAllTscnFiles);
         }
 
-        private void ProcessAllTscnFiles(SourceProductionContext context, 
+        private void ProcessAllTscnFiles(SourceProductionContext context,
             (
                 ImmutableArray<(string File, string Content)> TscnFiles, 
-                AnalyzerConfigOptionsProvider AnalyzerConfigOptionsProvider
+                (
+                    AnalyzerConfigOptionsProvider AnalyzerConfigOptionsProvider, 
+                    string? TscnGeneratorGodotRoot
+                ) Meta
             ) data)
         {
-            var (tscnFiles, analyzerConfigOptionsProvider) = data;
+            var (tscnFiles, (analyzerConfigOptionsProvider, rootGodot)) = data;
             if (analyzerConfigOptionsProvider.GlobalOptions.TryGetValue("build_property.projectdir", out var projectDir))
             {
                 var scenesBuilder = new CodeStringBuilder();
 
+                // when scenes are in a subdirectory, use <TscnGeneratorGodotRoot> csproj property to set relative directory
+                if (!string.IsNullOrWhiteSpace(rootGodot))
+                {
+                    projectDir = Path.Combine(projectDir, rootGodot);
+                    // makes sure it ends with directory separator
+                    if (projectDir[projectDir.Length-1] != Path.DirectorySeparatorChar)
+                    {
+                        projectDir += Path.DirectorySeparatorChar;
+                    }
+                }
                 var sceneNode = CreateSceneNodes(projectDir, [..tscnFiles.Select(f => f.File)]);
                 string startingPath = "";
-                if (sceneNode.Nodes.Count == 1 && sceneNode.Scenes.Count == 0 
-                                               && sceneNode.Nodes.ContainsKey("Scenes"))
+                if (sceneNode.Nodes.Count == 1 
+                    && sceneNode.Scenes.Count == 0 
+                    && sceneNode.Nodes.ContainsKey("Scenes"))
                 {
                     sceneNode = sceneNode.Nodes.Values.Single();
                     startingPath = "Scenes";
                 }
-                scenesBuilder.AppendLine("using Godot;");
+                scenesBuilder.AppendLine($"using Godot;");
             
                 PopulateScenes(scenesBuilder, sceneNode, startingPath);
                 context.AddSource($"PackedScenes.g.cs", scenesBuilder.ToString());
@@ -275,7 +300,7 @@ namespace GodotTscnSourceGenerator
             return text.Replace(" ", "_");
         }
 
-        private static SceneNode CreateSceneNodes(string projectDir, string[] paths)
+        public static SceneNode CreateSceneNodes(string projectDir, ImmutableArray<string> paths)
         {
             var root = new SceneNode("");
             foreach (string path in paths)
