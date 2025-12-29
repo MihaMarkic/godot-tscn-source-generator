@@ -79,8 +79,8 @@ namespace GodotTscnSourceGenerator
                  .AnalyzerConfigOptionsProvider
                  // Retrieve the RootNamespace property
                  .Select((AnalyzerConfigOptionsProvider c, CancellationToken _) =>
-                     c.GlobalOptions.TryGetValue("build_property.TscnGeneratorGodotRoot", out var nameSpace)
-                         ? nameSpace
+                     c.GlobalOptions.TryGetValue("build_property.TscnGeneratorGodotRoot", out var godotRelativeRoot)
+                         ? godotRelativeRoot
                          : null);
 
             var metadataProvider = context.AnalyzerConfigOptionsProvider.Combine(rootGodot);
@@ -123,7 +123,7 @@ namespace GodotTscnSourceGenerator
                     sceneNode = sceneNode.Nodes.Values.Single();
                     startingPath = "Scenes";
                 }
-                scenesBuilder.AppendLine($"using Godot;");
+                scenesBuilder.AppendLine("using Godot;");
 
                 if (!string.IsNullOrWhiteSpace(rootGodot))
                 {
