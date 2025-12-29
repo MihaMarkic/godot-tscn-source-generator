@@ -124,7 +124,11 @@ namespace GodotTscnSourceGenerator
                     startingPath = "Scenes";
                 }
                 scenesBuilder.AppendLine($"using Godot;");
-            
+
+                if (!string.IsNullOrWhiteSpace(rootGodot))
+                {
+                    startingPath = Path.Combine(rootGodot, startingPath);
+                }
                 PopulateScenes(scenesBuilder, sceneNode, startingPath);
                 context.AddSource($"PackedScenes.g.cs", scenesBuilder.ToString());
             }

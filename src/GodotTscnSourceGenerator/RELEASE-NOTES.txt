@@ -1,3 +1,5 @@
+v1.1.1-beta.2
+    - fixes bug with scheme generator not taking into account relative path introduced in previous build
 v1.1.1-beta.1
     - If Scenes directory is not at the root of the project, then PackedScenes.g.cs will generate more nested structure.
       To avoid that, set <TscnGeneratorGodotRoot> set property to i.e. src/ to avoid unnecessary nesting.
