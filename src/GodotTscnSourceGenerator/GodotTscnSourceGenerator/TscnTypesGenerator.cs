@@ -44,7 +44,7 @@ namespace GodotTscnSourceGenerator
                 if (listener.Script is not null && listener.RootNode is not null)
                 {
                     var sb = new CodeStringBuilder();
-                    sb.AppendLine("using Godot;");
+                    sb.AppendLine($"using Godot;");
                     string safeClassName = listener.Script.ClassName.GetSafeName();
                     sb.AppendLine($"partial class {safeClassName}");
                     sb.AppendStartBlock();
@@ -188,7 +188,7 @@ namespace GodotTscnSourceGenerator
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     new DiagnosticDescriptor(
-                        "GTSG0002",
+                        "GTSG0003",
                         $"GODOTPROJ parsing error on {data.File}",
                         $"File {data.File}: {ex.Message}",
                         "Parsing GodotProj",

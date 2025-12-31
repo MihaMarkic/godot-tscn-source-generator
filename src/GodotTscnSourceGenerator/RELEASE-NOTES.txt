@@ -1,3 +1,6 @@
+v1.1.1-beta.3
+    - fixes bug when root node didn't have script associated it wasn't recognized as root
+    - GTSG0002 error code was duplicated
 v1.1.1-beta.2
     - fixes bug with scheme generator not taking into account relative path introduced in previous build
 v1.1.1-beta.1

@@ -107,14 +107,18 @@ namespace GodotTscnSourceGenerator
                                         DiagnosticSeverity.Warning, true), null));
                             }
                         }
-                        else if (script is not null)
+                        else
                         {
                             RootNode = _lastNode = new Node(name!, type!, null, null, subResources, [..groups]);
-                            Script = script;
+                            if (script is not null)
+                            {
+                                Script = script;
+                            }
                         }
                     }
                 }
             }
+
             base.ExitNode(context);
         }
 

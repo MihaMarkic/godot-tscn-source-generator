@@ -5,12 +5,13 @@ using GodotTscnSourceGenerator.Models;
 using NUnit.Framework;
 using Righthand.GodotTscnParser.Engine.Grammar;
 using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 
 namespace GodotTscnSourceGenerator.Test;
 
 internal class TscnListenerTest
 {
-    protected TscnListener Run<TContext>(string text, Func<TscnParser, TContext> run)
+    private static TscnListener Run<TContext>(string text, Func<TscnParser, TContext> run, Action<Diagnostic>? reportDiagnostic = null)
         where TContext : ParserRuleContext
     {
         var input = new AntlrInputStream(text);
@@ -23,16 +24,21 @@ internal class TscnListenerTest
         };
         parser.AddErrorListener(new ErrorListener());
         var tree = run(parser);
-        var listener = new TscnListener(_ => { }, "file");
+        reportDiagnostic ??= NullReportDiagnostic;
+        var listener = new TscnListener(reportDiagnostic, "file");
         ParseTreeWalker.Default.Walk(listener, tree);
         return listener;
     }
 
-    protected TscnListener Run(string text)
+    private static void NullReportDiagnostic(Diagnostic diagnostic)
+    { }
+
+    private static TscnListener Run(string text, Action<Diagnostic>? reportDiagnostic = null)
     {
-        return Run<TscnParser.FileContext>(text, p => p.file());
+        return Run<TscnParser.FileContext>(text, p => p.file(), reportDiagnostic);
     }
-    protected string LoadSample(string fileName)
+
+    private string LoadSample(string fileName)
     {
         var projectDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "Samples");
         string path = Path.Combine(projectDirectory, $"{fileName}.tscn");
@@ -273,4 +279,25 @@ internal class TscnListenerTest
             return TscnListener.GetClassName(path);
         }
     }
+
+    [Test]
+    public void WhenNodeWithParentDot_ParsesCorrectly()
+    {
+        const string input = """
+                             [gd_scene load_steps=2 format=3 uid="uid://bi4yp1vixeaj7"]
+                             
+                             [ext_resource type="Texture2D" uid="uid://6y5njrvvpry3" path="res://src/Assets/Weapons/weapon_upgrade_button.svg" id="1_s245d"]
+                             
+                             [node name="WeaponUpgradePicker" type="PanelContainer"]
+                             
+                             [node name="UpgradeButton" type="Button" parent="."]
+                             layout_mode = 2
+                             icon = ExtResource("1_s245d")
+                             """;
+        List<Diagnostic> errors = new();
+        Run(input, d => errors.Add(d));
+        
+        Assert.That(errors, Is.Empty);
+    }
 }
+                             
