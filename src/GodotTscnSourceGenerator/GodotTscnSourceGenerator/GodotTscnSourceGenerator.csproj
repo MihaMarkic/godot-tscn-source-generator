@@ -15,7 +15,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.1.1-beta.2</Version>
+    <Version>1.1.1-beta.3</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>(Please write the package release notes in "RELEASE NOTES.txt)</PackageReleaseNotes>
     <AssemblyName>Righthand.GodotSourceGenerator</AssemblyName>
