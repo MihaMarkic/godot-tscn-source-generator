@@ -1,0 +1,50 @@
+- makes library DevelopmentDependency to prevent transitive behavior
+v1.1.1-beta.4
+    - makes library DevelopmentDependency to prevent transitive behavior
+v1.1.1-beta.3
+    - fixes bug when root node didn't have script associated it wasn't recognized as root
+    - GTSG0002 error code was duplicated
+v1.1.1-beta.2
+    - fixes bug with scheme generator not taking into account relative path introduced in previous build
+v1.1.1-beta.1
+    - If Scenes directory is not at the root of the project, then PackedScenes.g.cs will generate more nested structure.
+      To avoid that, set <TscnGeneratorGodotRoot> set property to i.e. src/ to avoid unnecessary nesting.
+v1.1.0-beta.2
+    - fixes project.godot parsing (complexPairName)
+    - tries to convert godot script type names to C# type names
+v1.1.0-beta.1
+    - updates code for [incremental generator](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md)
+    - refactors code
+    - uses GodotTscnParser 1.0.0-beta.5
+v.1.0.0-beta.2
+	- adds support for editable [parser]
+v.1.0.0-beta.1
+	- promotes alpha.11 to beta
+v.1.0.0-alpha.11
+	- renames version to adhere to semantic versioning
+v.1.0.0-alpha11
+	- fixes strong typed resources missing using statement
+v.1.0.0-alpha10
+	- fixes strong typed resources path concatenation
+v.1.0.0-alpha9
+	- improves strong typed resources generator
+v.1.0.0-alpha8
+	- generates strong typed path to scenes resources
+v.1.0.0-alpha7
+	- fixes class name when .tscn name is not pascal cased
+v.1.0.0-alpha6
+	- rewrite node generator to support nesting
+	- sample updated
+v.1.0.0-alpha5
+	- adds support for nested nodes
+v.1.0.0-alpha4
+	- updates nodes and scripts parsing
+	- updates godot project parsing
+	- adds groups to nodes
+v.1.0.0-alpha3
+	 - adds input actions constants based on project.godot file parsing
+v.1.0.0-alpha2
+	- adds strong typed animation names
+v.1.0.0-alpha1
+	- initial version
+	- creates strong typed GetNode calls

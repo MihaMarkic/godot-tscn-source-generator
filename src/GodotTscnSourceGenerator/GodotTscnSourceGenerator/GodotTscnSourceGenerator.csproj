@@ -15,10 +15,11 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.1.1-beta.3</Version>
+    <Version>1.1.1-beta.4</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>(Please write the package release notes in "RELEASE NOTES.txt)</PackageReleaseNotes>
     <AssemblyName>Righthand.GodotSourceGenerator</AssemblyName>
+    <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
   <Choose>
@@ -47,12 +48,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Docs\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
   </ItemGroup>
@@ -70,6 +65,12 @@
      <!--Package references--> 
     <None Include="$(PKGRighthand_GodotTscnParser)\lib\netstandard2.0\Righthand.GodotTscnParser.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(PKGAntlr4_Runtime_Standard)\lib\netstandard2.0\Antlr4.Runtime.Standard.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+  <ItemGroup>
+      <Content Include="../../../README.md">
+          <Pack>True</Pack>
+          <PackagePath>\</PackagePath>
+      </Content>
   </ItemGroup>
 
 
