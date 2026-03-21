@@ -1,1 +1,1 @@
-- makes library DevelopmentDependency to prevent transitive behavior
+- prefixes Timer instance with Godot. to avoid conflicts with System.Threading namespace

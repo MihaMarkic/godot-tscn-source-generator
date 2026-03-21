@@ -207,15 +207,25 @@ namespace GodotTscnSourceGenerator
             {
                 return typeName;
             }
-            Span<char> chars = stackalloc char[typeName.Length];
-            for (int i = 0; i < typeName.Length; i++)
-            {
-                char c = typeName[i];
-                bool castToLowercase = char.IsUpper(c) && i > 0 && i < typeName.Length-1 && char.IsUpper(typeName[i + 1]); 
-                chars[i] = castToLowercase ? char.ToLower(c): c;
-            }
 
-            return chars.ToString();
+            switch (typeName)
+            {
+	            case "Timer":
+		            // avoids class with System.Threading namespace
+		            return "Godot.Timer";
+	            default:
+		            Span<char> chars = stackalloc char[typeName.Length];
+		            for (int i = 0; i < typeName.Length; i++)
+		            {
+			            char c = typeName[i];
+			            bool castToLowercase = char.IsUpper(c) && i > 0 && i < typeName.Length - 1 &&
+			                                   char.IsUpper(typeName[i + 1]);
+			            chars[i] = castToLowercase ? char.ToLower(c) : c;
+		            }
+
+		            return chars.ToString();
+		            break;
+            }
         }
 
         private static void PopulateNodeResources(CodeStringBuilder sb, string owner, Node n)
