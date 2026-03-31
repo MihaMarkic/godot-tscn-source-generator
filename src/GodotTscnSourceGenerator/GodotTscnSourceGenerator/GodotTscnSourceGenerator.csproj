@@ -42,7 +42,7 @@
   </Target>
 
   <ItemGroup>
-    <None Include="..\..\..\LICENSE" Link="LICENSE">
+    <None Include="../../../LICENSE" Link="LICENSE">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
@@ -63,8 +63,8 @@
      <!--Package the generator in the analyzer directory of the nuget package-->  
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
      <!--Package references--> 
-    <None Include="$(PKGRighthand_GodotTscnParser)\lib\netstandard2.0\Righthand.GodotTscnParser.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGAntlr4_Runtime_Standard)\lib\netstandard2.0\Antlr4.Runtime.Standard.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PKGRighthand_GodotTscnParser)/lib\netstandard2.0/Righthand.GodotTscnParser.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PKGAntlr4_Runtime_Standard)/lib\netstandard2.0/Antlr4.Runtime.Standard.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
   <ItemGroup>
       <Content Include="../../../README.md">
