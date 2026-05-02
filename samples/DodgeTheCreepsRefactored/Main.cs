@@ -29,7 +29,7 @@ public partial class Main : Node
 		var startPosition = StartPosition.Instance;
 		player.Start(startPosition.Position);
 
-		GetNode<Timer>("StartTimer").Start();
+		StartTimer.Instance.Start();
 
 		var hud = HUD.Instance;
 		hud.UpdateScore(_score);
@@ -61,7 +61,7 @@ public partial class Main : Node
 		var mob = MobScene.Instantiate<Mob>();
 
 		// Choose a random location on Path2D.
-		var mobSpawnLocation = GetNode<PathFollow2D>("MobPath/MobSpawnLocation");
+		var mobSpawnLocation = MobPath.MobSpawnLocation.Instance;
 		mobSpawnLocation.ProgressRatio = GD.Randf();
 
 		// Set the mob's direction perpendicular to the path direction.
