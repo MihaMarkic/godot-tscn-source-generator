@@ -17,6 +17,11 @@ namespace GodotTscnSourceGenerator
     [Generator(LanguageNames.CSharp)]
     public class TscnTypesGenerator : IIncrementalGenerator
     {
+	    public const string ParsingErrorId = "GTSG0001";
+	    public const string NoParentErrorId = "GTSG0002";
+	    public const string InputActionsParsingErrorId = "GTSG0003";
+	    public const string EmptyFileWarningId = "GTSG0004";
+	    
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             ProcessGodotProjFile(context);
@@ -52,12 +57,22 @@ namespace GodotTscnSourceGenerator
                     sb.AppendEndBlock();
                     context.AddSource($"{listener.Script.ClassName}.g.cs", sb.ToString());
                 }
+                else
+                {
+	                context.ReportDiagnostic(Diagnostic.Create(
+		                new DiagnosticDescriptor(
+			                EmptyFileWarningId,
+			                $"GODOTPROJ parsing warning on {data.File}",
+			                $"File {data.File}: either script or root node ar null",
+			                "Parsing GodotProj",
+			                DiagnosticSeverity.Warning, true), null));   
+                }
             }
             catch (Exception ex)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     new DiagnosticDescriptor(
-                        "GTSG0001",
+	                    ParsingErrorId,
                         $"TSCN parsing error on {data.File}",
                         $"File {data.File}: {ex.Message}",
                         "Parsing tscn",
@@ -188,7 +203,7 @@ namespace GodotTscnSourceGenerator
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     new DiagnosticDescriptor(
-                        "GTSG0003",
+	                    InputActionsParsingErrorId,
                         $"GODOTPROJ parsing error on {data.File}",
                         $"File {data.File}: {ex.Message}",
                         "Parsing GodotProj",

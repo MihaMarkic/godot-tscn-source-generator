@@ -100,7 +100,7 @@ namespace GodotTscnSourceGenerator
                             {
                                 _reportDiagnostic(Diagnostic.Create(
                                     new DiagnosticDescriptor(
-                                        "GTSG0002",
+	                                    TscnTypesGenerator.NoParentErrorId,
                                         $"TSCN parsing error on {_fileName}",
                                         $"File {_fileName}: Could not find parent node for node {name} with parent path {parentPath}",
                                         "Parsing tscn",
